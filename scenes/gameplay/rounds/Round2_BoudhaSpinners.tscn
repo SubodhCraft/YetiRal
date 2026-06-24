@@ -1,0 +1,243 @@
+[gd_scene load_steps=13 format=3 uid="uid://round2_scene"]
+
+[ext_resource type="Script" path="res://scripts/rounds/Round2_BoudhaSpinners.gd" id="1_spinners"]
+[ext_resource type="PackedScene" uid="uid://momocoin_scene" path="res://scenes/gameplay/MomoCoin.tscn" id="2_momo"]
+
+[sub_resource type="ProceduralSkyMaterial" id="Sky_1"]
+sky_top_color = Color(0.15, 0.42, 0.78, 1.0)
+sky_horizon_color = Color(0.65, 0.8, 0.95, 1.0)
+ground_bottom_color = Color(0.12, 0.15, 0.18, 1.0)
+
+[sub_resource type="Sky" id="Sky_2"]
+sky_material = SubResource("Sky_1")
+
+[sub_resource type="Environment" id="Env_1"]
+background_mode = 2
+sky = SubResource("Sky_2")
+tonemap_mode = 2
+glow_enabled = true
+
+[sub_resource type="StandardMaterial3D" id="Mat_Gold"]
+albedo_color = Color(0.95, 0.78, 0.25, 1.0)
+roughness = 0.2
+emission_enabled = true
+emission = Color(0.95, 0.78, 0.25, 1.0)
+emission_energy_multiplier = 0.1
+
+[sub_resource type="StandardMaterial3D" id="Mat_White"]
+albedo_color = Color(0.95, 0.95, 0.95, 1.0)
+roughness = 0.7
+
+[sub_resource type="StandardMaterial3D" id="Mat_PrayerRed"]
+albedo_color = Color(0.8, 0.15, 0.15, 1.0)
+roughness = 0.4
+
+[sub_resource type="StandardMaterial3D" id="Mat_PrayerBlue"]
+albedo_color = Color(0.15, 0.35, 0.8, 1.0)
+roughness = 0.4
+
+[sub_resource type="StandardMaterial3D" id="Mat_PrayerGreen"]
+albedo_color = Color(0.1, 0.6, 0.2, 1.0)
+roughness = 0.4
+
+[sub_resource type="StandardMaterial3D" id="Mat_Stone"]
+albedo_color = Color(0.35, 0.38, 0.42, 1.0)
+roughness = 0.9
+
+[sub_resource type="BoxShape3D" id="Shape_Kill"]
+size = Vector3(100, 5, 140)
+
+[sub_resource type="BoxShape3D" id="Shape_Finish"]
+size = Vector3(14, 10, 14)
+
+[sub_resource type="BoxShape3D" id="Shape_SweeperBar"]
+size = Vector3(9.0, 0.6, 0.6)
+
+[sub_resource type="BoxMesh" id="Mesh_SweeperBar"]
+size = Vector3(9.0, 0.6, 0.6)
+
+; ── ROOT ──────────────────────────────────────────────────────────────────────
+[node name="Round2_BoudhaSpinners" type="Node3D"]
+script = ExtResource("1_spinners")
+round_name = "ROUND 2: BOUDHA SPINNERS"
+time_limit = 85.0
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Env_1")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.866025, -0.353553, 0.353553, 0, 0.707107, 0.707107, -0.5, -0.612372, 0.612372, 0, 20, 0)
+shadow_enabled = true
+
+[node name="SpawnPoint" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.0, 0)
+
+[node name="KillZone" type="Area3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -18.0, -35.0)
+collision_mask = 2
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="KillZone"]
+shape = SubResource("Shape_Kill")
+
+[node name="FinishZone" type="Area3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.0, -102.0)
+collision_mask = 2
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="FinishZone"]
+shape = SubResource("Shape_Finish")
+
+; ── MAP GEOMETRY ──────────────────────────────────────────────────────────────
+[node name="MapGeometry" type="CSGCombiner3D" parent="."]
+use_collision = true
+
+[node name="StartPlatform" type="CSGBox3D" parent="MapGeometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+size = Vector3(10, 1, 8)
+material = SubResource("Mat_White")
+
+; Bridge 1 — narrow approach to Spinner 1
+[node name="Bridge1" type="CSGBox3D" parent="MapGeometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, -8)
+size = Vector3(3, 1, 8)
+material = SubResource("Mat_White")
+
+; Spinner platform 1
+[node name="SpinPlatform1" type="CSGCylinder3D" parent="MapGeometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, -18.0)
+radius = 6.0
+height = 1.0
+material = SubResource("Mat_White")
+
+; Narrow bridge 2 with a low hurdle to duck/jump
+[node name="Bridge2" type="CSGBox3D" parent="MapGeometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, -27)
+size = Vector3(3, 1, 8)
+material = SubResource("Mat_White")
+
+[node name="BridgeHurdle" type="CSGBox3D" parent="MapGeometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, -26)
+size = Vector3(3, 1.8, 0.5)
+material = SubResource("Mat_Stone")
+
+; Spinner platform 2
+[node name="SpinPlatform2" type="CSGCylinder3D" parent="MapGeometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, -38.0)
+radius = 6.0
+height = 1.0
+material = SubResource("Mat_White")
+
+; Narrow bridge 3
+[node name="Bridge3" type="CSGBox3D" parent="MapGeometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, -48)
+size = Vector3(3, 1, 8)
+material = SubResource("Mat_White")
+
+; Spinner platform 3 (NEW)
+[node name="SpinPlatform3" type="CSGCylinder3D" parent="MapGeometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, -58.0)
+radius = 6.0
+height = 1.0
+material = SubResource("Mat_White")
+
+; Bridge to Spinner 4 + extra hurdles
+[node name="Bridge4" type="CSGBox3D" parent="MapGeometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, -66)
+size = Vector3(3, 1, 8)
+material = SubResource("Mat_White")
+
+[node name="Bridge4Hurdle" type="CSGBox3D" parent="MapGeometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, -65)
+size = Vector3(3, 1.6, 0.5)
+material = SubResource("Mat_Stone")
+
+; Spinner platform 4 (hardest)
+[node name="SpinPlatform4" type="CSGCylinder3D" parent="MapGeometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, -78.0)
+radius = 6.0
+height = 1.0
+material = SubResource("Mat_White")
+
+; Narrow bridge 5 with two hurdles to reach finish
+[node name="Bridge5" type="CSGBox3D" parent="MapGeometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, -88)
+size = Vector3(2.5, 1, 8)
+material = SubResource("Mat_White")
+
+[node name="FinalHurdle1" type="CSGBox3D" parent="MapGeometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, -87)
+size = Vector3(2.5, 1.8, 0.5)
+material = SubResource("Mat_Stone")
+
+[node name="FinalHurdle2" type="CSGBox3D" parent="MapGeometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, -91)
+size = Vector3(2.5, 2.2, 0.5)
+material = SubResource("Mat_Stone")
+
+[node name="FinishPlatform" type="CSGBox3D" parent="MapGeometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, -102.0)
+size = Vector3(10, 1, 6)
+material = SubResource("Mat_Gold")
+
+; ── SPINNERS ──────────────────────────────────────────────────────────────────
+[node name="Spinners" type="Node3D" parent="."]
+
+[node name="Sweeper1" type="AnimatableBody3D" parent="Spinners"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, -18.0)
+collision_layer = 1
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Spinners/Sweeper1"]
+shape = SubResource("Shape_SweeperBar")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Spinners/Sweeper1"]
+mesh = SubResource("Mesh_SweeperBar")
+surface_material_override/0 = SubResource("Mat_PrayerRed")
+
+[node name="Sweeper2" type="AnimatableBody3D" parent="Spinners"]
+transform = Transform3D(0.707107, 0, 0.707107, 0, 1, 0, -0.707107, 0, 0.707107, 0, 0.3, -38.0)
+collision_layer = 1
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Spinners/Sweeper2"]
+shape = SubResource("Shape_SweeperBar")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Spinners/Sweeper2"]
+mesh = SubResource("Mesh_SweeperBar")
+surface_material_override/0 = SubResource("Mat_PrayerBlue")
+
+[node name="Sweeper3" type="AnimatableBody3D" parent="Spinners"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, -58.0)
+collision_layer = 1
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Spinners/Sweeper3"]
+shape = SubResource("Shape_SweeperBar")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Spinners/Sweeper3"]
+mesh = SubResource("Mesh_SweeperBar")
+surface_material_override/0 = SubResource("Mat_PrayerGreen")
+
+[node name="Sweeper4" type="AnimatableBody3D" parent="Spinners"]
+transform = Transform3D(0.707107, 0, -0.707107, 0, 1, 0, 0.707107, 0, 0.707107, 0, 0.3, -78.0)
+collision_layer = 1
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Spinners/Sweeper4"]
+shape = SubResource("Shape_SweeperBar")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Spinners/Sweeper4"]
+mesh = SubResource("Mesh_SweeperBar")
+surface_material_override/0 = SubResource("Mat_PrayerRed")
+
+; ── MOMO COINS ────────────────────────────────────────────────────────────────────────────
+[node name="MomoCoin" parent="." instance=ExtResource("2_momo")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2, -18)
+
+[node name="MomoCoin2" parent="." instance=ExtResource("2_momo")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.0, 1.2, -38)
+
+[node name="MomoCoin3" parent="." instance=ExtResource("2_momo")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.0, 1.2, -58)
+
+[node name="MomoCoin4" parent="." instance=ExtResource("2_momo")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.0, 1.2, -78)

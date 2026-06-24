@@ -1,0 +1,58 @@
+[gd_scene load_steps=7 format=3 uid="uid://momocoin_scene"]
+
+[ext_resource type="Script" path="res://scripts/MomoCoin.gd" id="1_momo"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_1"]
+radius = 0.5
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_Momo"]
+albedo_color = Color(0.96, 0.91, 0.76, 1.0)
+roughness = 0.7
+emission_enabled = true
+emission = Color(0.96, 0.88, 0.61, 1.0)
+emission_energy_multiplier = 0.15
+
+[sub_resource type="SphereMesh" id="SphereMesh_Base"]
+material = SubResource("StandardMaterial3D_Momo")
+radius = 0.25
+height = 0.35
+
+[sub_resource type="CylinderMesh" id="ConeMesh_Pinch"]
+material = SubResource("StandardMaterial3D_Momo")
+top_radius = 0.0
+bottom_radius = 0.12
+height = 0.18
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_Ring"]
+albedo_color = Color(1.0, 0.84, 0.0, 1.0)
+roughness = 0.2
+emission_enabled = true
+emission = Color(1.0, 0.84, 0.0, 1.0)
+emission_energy_multiplier = 0.5
+
+[sub_resource type="TorusMesh" id="TorusMesh_Glow"]
+material = SubResource("StandardMaterial3D_Ring")
+inner_radius = 0.32
+outer_radius = 0.35
+
+[node name="MomoCoin" type="Area3D"]
+collision_layer = 4
+collision_mask = 2
+script = ExtResource("1_momo")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("SphereShape3D_1")
+
+[node name="Visuals" type="Node3D" parent="."]
+
+[node name="MomoBase" type="MeshInstance3D" parent="Visuals"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.05, 0)
+mesh = SubResource("SphereMesh_Base")
+
+[node name="MomoPinch" type="MeshInstance3D" parent="Visuals"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.15, 0)
+mesh = SubResource("ConeMesh_Pinch")
+
+[node name="GlowRing" type="MeshInstance3D" parent="Visuals"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.15, 0)
+mesh = SubResource("TorusMesh_Glow")

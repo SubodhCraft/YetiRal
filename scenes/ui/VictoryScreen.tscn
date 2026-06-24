@@ -1,0 +1,90 @@
+[gd_scene load_steps=6 format=3 uid="uid://victoryscreen_scene"]
+
+[ext_resource type="Script" path="res://scripts/VictoryScreen.gd" id="1_victory"]
+
+[sub_resource type="StyleBoxFlat" id="SB_BG"]
+bg_color = Color(0.08, 0.07, 0.02, 1.0)
+
+[sub_resource type="StyleBoxFlat" id="SB_BtnLobby"]
+bg_color = Color(0.72, 0.52, 0.04, 1.0)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.95, 0.78, 0.25, 1.0)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="SB_BtnLobbyHover"]
+bg_color = Color(0.85, 0.65, 0.05, 1.0)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(1.0, 0.9, 0.4, 1.0)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[node name="VictoryScreen" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_victory")
+
+[node name="Background" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("SB_BG")
+
+[node name="CenterContainer" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBox" type="VBoxContainer" parent="CenterContainer"]
+layout_mode = 2
+theme_override_constants/separation = 40
+alignment = 1
+
+[node name="Title" type="Label" parent="CenterContainer/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.78, 0.25, 1.0)
+theme_override_font_sizes/font_size = 80
+text = "VICTORY!"
+horizontal_alignment = 1
+
+[node name="MomosCollectedLabel" type="Label" parent="CenterContainer/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "🥟 FINAL MOMOS COLLECTED: 0"
+horizontal_alignment = 1
+
+[node name="HBoxButtons" type="HBoxContainer" parent="CenterContainer/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 24
+alignment = 1
+
+[node name="LobbyBtn" type="Button" parent="CenterContainer/VBox/HBoxButtons"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(250, 60)
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = SubResource("SB_BtnLobby")
+theme_override_styles/hover = SubResource("SB_BtnLobbyHover")
+theme_override_styles/pressed = SubResource("SB_BtnLobbyHover")
+text = "RETURN TO LOBBY"

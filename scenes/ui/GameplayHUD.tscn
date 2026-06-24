@@ -1,0 +1,120 @@
+[gd_scene load_steps=7 format=3 uid="uid://gameplayhud_scene"]
+
+[ext_resource type="Script" path="res://scripts/GameplayHUD.gd" id="1_hud"]
+
+[sub_resource type="StyleBoxFlat" id="SB_HUDPanel"]
+bg_color = Color(0.06, 0.08, 0.11, 0.6)
+border_width_bottom = 2
+border_color = Color(0.18, 0.22, 0.28, 0.5)
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="SB_TimerBG"]
+bg_color = Color(0.1, 0.13, 0.18, 1.0)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+
+[sub_resource type="StyleBoxFlat" id="SB_TimerFill"]
+bg_color = Color(0.18, 0.8, 0.44, 1.0)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+
+[sub_resource type="StyleBoxFlat" id="SB_MomoPanel"]
+bg_color = Color(0.96, 0.88, 0.61, 0.2)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.96, 0.88, 0.61, 0.6)
+corner_radius_top_left = 15
+corner_radius_top_right = 15
+corner_radius_bottom_right = 15
+corner_radius_bottom_left = 15
+expand_margin_left = 15.0
+expand_margin_top = 5.0
+expand_margin_right = 15.0
+expand_margin_bottom = 5.0
+
+[node name="GameplayHUD" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_hud")
+
+[node name="TopPanel" type="PanelContainer" parent="."]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 80.0
+grow_horizontal = 2
+theme_override_styles/panel = SubResource("SB_HUDPanel")
+
+[node name="MarginContainer" type="MarginContainer" parent="TopPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_right = 20
+
+[node name="HBoxContainer" type="HBoxContainer" parent="TopPanel/MarginContainer"]
+layout_mode = 2
+alignment = 1
+
+[node name="RoundNameLabel" type="Label" parent="TopPanel/MarginContainer/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 2
+theme_override_font_sizes/font_size = 28
+text = "ROUND 1: HIMALAYAN CLIMB"
+vertical_alignment = 1
+
+[node name="TimerContainer" type="VBoxContainer" parent="TopPanel/MarginContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+alignment = 1
+
+[node name="TimerLabel" type="Label" parent="TopPanel/MarginContainer/HBoxContainer/TimerContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "1:00"
+horizontal_alignment = 1
+
+[node name="TimerProgressBar" type="ProgressBar" parent="TopPanel/MarginContainer/HBoxContainer/TimerContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(300, 10)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_styles/background = SubResource("SB_TimerBG")
+theme_override_styles/fill = SubResource("SB_TimerFill")
+value = 100.0
+show_percentage = false
+
+[node name="StatsContainer" type="HBoxContainer" parent="TopPanel/MarginContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 10
+theme_override_constants/separation = 30
+alignment = 2
+
+[node name="MomoPanel" type="PanelContainer" parent="TopPanel/MarginContainer/HBoxContainer/StatsContainer"]
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_styles/panel = SubResource("SB_MomoPanel")
+
+[node name="MomoLabel" type="Label" parent="TopPanel/MarginContainer/HBoxContainer/StatsContainer/MomoPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "🥟 0"
+vertical_alignment = 1
+
+[node name="HeartsContainer" type="HBoxContainer" parent="TopPanel/MarginContainer/HBoxContainer/StatsContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+alignment = 1

@@ -1,0 +1,302 @@
+[gd_scene load_steps=12 format=3 uid="uid://round7_scene"]
+
+[ext_resource type="Script" path="res://scripts/rounds/Round7_LavaDoors.gd" id="1_lava"]
+[ext_resource type="PackedScene" path="res://scenes/gameplay/MomoCoin.tscn" id="2_momo"]
+
+[sub_resource type="ProceduralSkyMaterial" id="Sky_1"]
+sky_top_color = Color(0.25, 0.05, 0.05, 1.0)
+sky_horizon_color = Color(0.4, 0.1, 0.05, 1.0)
+ground_bottom_color = Color(0.15, 0.05, 0.05, 1.0)
+
+[sub_resource type="Sky" id="Sky_2"]
+sky_material = SubResource("Sky_1")
+
+[sub_resource type="Environment" id="Env_1"]
+background_mode = 2
+sky = SubResource("Sky_2")
+tonemap_mode = 2
+glow_enabled = true
+
+[sub_resource type="StandardMaterial3D" id="Mat_Lava"]
+albedo_color = Color(0.9, 0.2, 0.0, 1.0)
+roughness = 0.2
+emission_enabled = true
+emission = Color(0.9, 0.2, 0.0, 1.0)
+emission_energy_multiplier = 0.5
+
+[sub_resource type="StandardMaterial3D" id="Mat_Wall"]
+albedo_color = Color(0.2, 0.2, 0.2, 1.0)
+roughness = 0.8
+
+[sub_resource type="StandardMaterial3D" id="Mat_Door"]
+albedo_color = Color(0.4, 0.3, 0.2, 1.0)
+roughness = 0.6
+
+[sub_resource type="BoxShape3D" id="Shape_Kill"]
+size = Vector3(100, 5, 200)
+
+[sub_resource type="BoxShape3D" id="Shape_Finish"]
+size = Vector3(14, 10, 14)
+
+[sub_resource type="BoxShape3D" id="Shape_Trigger"]
+size = Vector3(4, 4, 2)
+
+[node name="Round7_LavaDoors" type="Node3D"]
+script = ExtResource("1_lava")
+round_name = "ROUND 7: LAVA DOORS"
+time_limit = 90.0
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Env_1")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.866025, -0.353553, 0.353553, 0, 0.707107, 0.707107, -0.5, -0.612372, 0.612372, 0, 20, 0)
+shadow_enabled = true
+
+[node name="SpawnPoint" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.0, 0)
+
+[node name="KillZone" type="Area3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -10.0, -60.0)
+collision_mask = 2
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="KillZone"]
+shape = SubResource("Shape_Kill")
+
+[node name="FinishZone" type="Area3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.0, -115.0)
+collision_mask = 2
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="FinishZone"]
+shape = SubResource("Shape_Finish")
+
+[node name="LavaVisual" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -8.0, -60.0)
+size = Vector3(50, 1, 150)
+material = SubResource("Mat_Lava")
+use_collision = false
+
+[node name="MapGeometry" type="CSGCombiner3D" parent="."]
+use_collision = true
+
+[node name="StartPlatform" type="CSGBox3D" parent="MapGeometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+size = Vector3(10, 1, 10)
+
+[node name="FinishPlatform" type="CSGBox3D" parent="MapGeometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, -115.0)
+size = Vector3(10, 1, 10)
+
+[node name="OuterWallLeft" type="CSGBox3D" parent="MapGeometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.5, 3.0, -55)
+size = Vector3(1, 8, 130)
+material = SubResource("Mat_Wall")
+
+[node name="OuterWallRight" type="CSGBox3D" parent="MapGeometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.5, 3.0, -55)
+size = Vector3(1, 8, 130)
+material = SubResource("Mat_Wall")
+
+; ── ROOM 1 ──────────────────────────────────────────
+[node name="Room1" type="Node3D" parent="MapGeometry"]
+
+[node name="Divider" type="CSGBox3D" parent="MapGeometry/Room1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.0, -15)
+size = Vector3(1, 8, 20)
+material = SubResource("Mat_Wall")
+
+[node name="BridgeLeft" type="CSGBox3D" parent="MapGeometry/Room1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.5, -0.5, -15)
+size = Vector3(5, 1, 20)
+
+[node name="BridgeRight" type="CSGBox3D" parent="MapGeometry/Room1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, -0.5, -15)
+size = Vector3(5, 1, 20)
+
+[node name="DoorLeft" type="CSGBox3D" parent="MapGeometry/Room1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.5, 2.0, -5)
+size = Vector3(5, 4, 0.5)
+material = SubResource("Mat_Door")
+
+[node name="DoorRight" type="CSGBox3D" parent="MapGeometry/Room1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, 2.0, -5)
+size = Vector3(5, 4, 0.5)
+material = SubResource("Mat_Door")
+
+; ── ROOM 2 ──────────────────────────────────────────
+[node name="Room2" type="Node3D" parent="MapGeometry"]
+
+[node name="Divider" type="CSGBox3D" parent="MapGeometry/Room2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.0, -35)
+size = Vector3(1, 8, 20)
+material = SubResource("Mat_Wall")
+
+[node name="BridgeLeft" type="CSGBox3D" parent="MapGeometry/Room2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.5, -0.5, -35)
+size = Vector3(5, 1, 20)
+
+[node name="BridgeRight" type="CSGBox3D" parent="MapGeometry/Room2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, -0.5, -35)
+size = Vector3(5, 1, 20)
+
+[node name="DoorLeft" type="CSGBox3D" parent="MapGeometry/Room2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.5, 2.0, -25)
+size = Vector3(5, 4, 0.5)
+material = SubResource("Mat_Door")
+
+[node name="DoorRight" type="CSGBox3D" parent="MapGeometry/Room2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, 2.0, -25)
+size = Vector3(5, 4, 0.5)
+material = SubResource("Mat_Door")
+
+; ── ROOM 3 ──────────────────────────────────────────
+[node name="Room3" type="Node3D" parent="MapGeometry"]
+
+[node name="Divider" type="CSGBox3D" parent="MapGeometry/Room3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.0, -55)
+size = Vector3(1, 8, 20)
+material = SubResource("Mat_Wall")
+
+[node name="BridgeLeft" type="CSGBox3D" parent="MapGeometry/Room3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.5, -0.5, -55)
+size = Vector3(5, 1, 20)
+
+[node name="BridgeRight" type="CSGBox3D" parent="MapGeometry/Room3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, -0.5, -55)
+size = Vector3(5, 1, 20)
+
+[node name="DoorLeft" type="CSGBox3D" parent="MapGeometry/Room3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.5, 2.0, -45)
+size = Vector3(5, 4, 0.5)
+material = SubResource("Mat_Door")
+
+[node name="DoorRight" type="CSGBox3D" parent="MapGeometry/Room3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, 2.0, -45)
+size = Vector3(5, 4, 0.5)
+material = SubResource("Mat_Door")
+
+; ── ROOM 4 ──────────────────────────────────────────
+[node name="Room4" type="Node3D" parent="MapGeometry"]
+
+[node name="Divider" type="CSGBox3D" parent="MapGeometry/Room4"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.0, -75)
+size = Vector3(1, 8, 20)
+material = SubResource("Mat_Wall")
+
+[node name="BridgeLeft" type="CSGBox3D" parent="MapGeometry/Room4"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.5, -0.5, -75)
+size = Vector3(5, 1, 20)
+
+[node name="BridgeRight" type="CSGBox3D" parent="MapGeometry/Room4"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, -0.5, -75)
+size = Vector3(5, 1, 20)
+
+[node name="DoorLeft" type="CSGBox3D" parent="MapGeometry/Room4"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.5, 2.0, -65)
+size = Vector3(5, 4, 0.5)
+material = SubResource("Mat_Door")
+
+[node name="DoorRight" type="CSGBox3D" parent="MapGeometry/Room4"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, 2.0, -65)
+size = Vector3(5, 4, 0.5)
+material = SubResource("Mat_Door")
+
+; ── ROOM 5 ──────────────────────────────────────────
+[node name="Room5" type="Node3D" parent="MapGeometry"]
+
+[node name="Divider" type="CSGBox3D" parent="MapGeometry/Room5"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.0, -95)
+size = Vector3(1, 8, 20)
+material = SubResource("Mat_Wall")
+
+[node name="BridgeLeft" type="CSGBox3D" parent="MapGeometry/Room5"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.5, -0.5, -95)
+size = Vector3(5, 1, 20)
+
+[node name="BridgeRight" type="CSGBox3D" parent="MapGeometry/Room5"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, -0.5, -95)
+size = Vector3(5, 1, 20)
+
+[node name="DoorLeft" type="CSGBox3D" parent="MapGeometry/Room5"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.5, 2.0, -85)
+size = Vector3(5, 4, 0.5)
+material = SubResource("Mat_Door")
+
+[node name="DoorRight" type="CSGBox3D" parent="MapGeometry/Room5"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, 2.0, -85)
+size = Vector3(5, 4, 0.5)
+material = SubResource("Mat_Door")
+
+
+[node name="Triggers" type="Node3D" parent="."]
+
+[node name="Room1_Left" type="Area3D" parent="Triggers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.5, 1.0, -4.0)
+collision_mask = 2
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Triggers/Room1_Left"]
+shape = SubResource("Shape_Trigger")
+
+[node name="Room1_Right" type="Area3D" parent="Triggers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, 1.0, -4.0)
+collision_mask = 2
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Triggers/Room1_Right"]
+shape = SubResource("Shape_Trigger")
+
+[node name="Room2_Left" type="Area3D" parent="Triggers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.5, 1.0, -24.0)
+collision_mask = 2
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Triggers/Room2_Left"]
+shape = SubResource("Shape_Trigger")
+
+[node name="Room2_Right" type="Area3D" parent="Triggers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, 1.0, -24.0)
+collision_mask = 2
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Triggers/Room2_Right"]
+shape = SubResource("Shape_Trigger")
+
+[node name="Room3_Left" type="Area3D" parent="Triggers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.5, 1.0, -44.0)
+collision_mask = 2
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Triggers/Room3_Left"]
+shape = SubResource("Shape_Trigger")
+
+[node name="Room3_Right" type="Area3D" parent="Triggers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, 1.0, -44.0)
+collision_mask = 2
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Triggers/Room3_Right"]
+shape = SubResource("Shape_Trigger")
+
+[node name="Room4_Left" type="Area3D" parent="Triggers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.5, 1.0, -64.0)
+collision_mask = 2
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Triggers/Room4_Left"]
+shape = SubResource("Shape_Trigger")
+
+[node name="Room4_Right" type="Area3D" parent="Triggers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, 1.0, -64.0)
+collision_mask = 2
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Triggers/Room4_Right"]
+shape = SubResource("Shape_Trigger")
+
+[node name="Room5_Left" type="Area3D" parent="Triggers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.5, 1.0, -84.0)
+collision_mask = 2
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Triggers/Room5_Left"]
+shape = SubResource("Shape_Trigger")
+
+[node name="Room5_Right" type="Area3D" parent="Triggers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, 1.0, -84.0)
+collision_mask = 2
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Triggers/Room5_Right"]
+shape = SubResource("Shape_Trigger")
+

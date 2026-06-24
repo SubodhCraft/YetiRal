@@ -1,0 +1,29 @@
+[gd_scene load_steps=1 format=3]
+
+; ══════════════════════════════════════════════════════════════════════════════
+; DEPRECATED — this file kept for reference only.
+; The ACTIVE auth scene is:  res://AuthScreen.tscn  (project root)
+; DO NOT attach scripts to this scene — it will conflict with AuthScreen.gd.
+; ══════════════════════════════════════════════════════════════════════════════
+
+[node name="DeprecatedAuthScreen" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Notice" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "⚠  This scene (scenes/AuthScreen.tscn) is DEPRECATED.\n\nThe active auth scene is:\nres://AuthScreen.tscn\n\nPress F5 to run the correct main scene."
+horizontal_alignment = 1
+vertical_alignment = 1
+theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(1.0, 0.6, 0.3, 1.0)
+autowrap_mode = 3

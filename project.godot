@@ -11,12 +11,23 @@ config_version=5
 [application]
 
 config/name="YetiRal"
+run/main_scene="res://AuthScreen.tscn"
+config/quit_on_go_back=false
 config/features=PackedStringArray("4.6", "Forward Plus")
 config/icon="res://icon.svg"
 
 [autoload]
 
 _mcp_game_helper="*res://addons/godot_ai/runtime/game_helper.gd"
+SessionManager="*res://scripts/SessionManager.gd"
+GameManager="*res://scripts/GameManager.gd"
+NetworkManager="*res://scripts/NetworkManager.gd"
+
+[display]
+
+window/size/viewport_width=1920
+window/size/viewport_height=1080
+window/size/initial_position_type=0
 
 [editor_plugins]
 

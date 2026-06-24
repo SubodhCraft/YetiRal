@@ -1,0 +1,325 @@
+[gd_scene load_steps=14 format=3 uid="uid://round6_scene"]
+
+[ext_resource type="Script" path="res://scripts/rounds/Round6_MemoryTiles.gd" id="1_memory"]
+[ext_resource type="PackedScene" path="res://scenes/gameplay/MomoCoin.tscn" id="2_momo"]
+
+; ─── SKY (deep purple/neon arena vibe) ───────────────────────────────────────
+[sub_resource type="ProceduralSkyMaterial" id="Sky_1"]
+sky_top_color = Color(0.08, 0.04, 0.18, 1.0)
+sky_horizon_color = Color(0.28, 0.08, 0.38, 1.0)
+ground_bottom_color = Color(0.04, 0.02, 0.08, 1.0)
+
+[sub_resource type="Sky" id="Sky_2"]
+sky_material = SubResource("Sky_1")
+
+[sub_resource type="Environment" id="Env_1"]
+background_mode = 2
+sky = SubResource("Sky_2")
+tonemap_mode = 2
+glow_enabled = true
+glow_intensity = 0.8
+fog_enabled = true
+fog_light_color = Color(0.22, 0.04, 0.32, 1.0)
+fog_density = 0.018
+ambient_light_source = 2
+ambient_light_color = Color(0.35, 0.15, 0.50, 1.0)
+ambient_light_energy = 0.8
+
+; ─── MATERIALS ────────────────────────────────────────────────────────────────
+[sub_resource type="StandardMaterial3D" id="Mat_Screen"]
+albedo_color = Color(0.05, 0.05, 0.08, 1.0)
+roughness = 0.3
+emission_enabled = true
+emission = Color(0.10, 0.04, 0.20, 1.0)
+emission_energy_multiplier = 0.5
+
+[sub_resource type="StandardMaterial3D" id="Mat_Tile"]
+albedo_color = Color(0.8, 0.8, 0.8, 1.0)
+roughness = 0.5
+
+[sub_resource type="StandardMaterial3D" id="Mat_Gold"]
+albedo_color = Color(0.95, 0.78, 0.25, 1.0)
+roughness = 0.2
+metallic = 0.5
+emission_enabled = true
+emission = Color(0.9, 0.7, 0.1, 1.0)
+emission_energy_multiplier = 0.8
+
+[sub_resource type="StandardMaterial3D" id="Mat_Platform"]
+albedo_color = Color(0.18, 0.12, 0.30, 1.0)
+roughness = 0.7
+emission_enabled = true
+emission = Color(0.35, 0.10, 0.55, 1.0)
+emission_energy_multiplier = 0.5
+
+; The dark abyss plane — fills the void below so there's no graphical misplacement
+[sub_resource type="StandardMaterial3D" id="Mat_Abyss"]
+albedo_color = Color(0.04, 0.02, 0.08, 1.0)
+roughness = 1.0
+emission_enabled = true
+emission = Color(0.08, 0.02, 0.14, 1.0)
+emission_energy_multiplier = 0.3
+
+; ─── SHAPES ───────────────────────────────────────────────────────────────────
+[sub_resource type="BoxShape3D" id="Shape_Kill"]
+size = Vector3(200, 8, 200)
+
+[sub_resource type="BoxShape3D" id="Shape_Finish"]
+size = Vector3(10, 5, 8)
+
+[sub_resource type="BoxShape3D" id="Shape_Tile"]
+size = Vector3(3.8, 0.5, 3.8)
+
+[sub_resource type="BoxMesh" id="Mesh_Tile"]
+size = Vector3(3.8, 0.5, 3.8)
+
+; ─── ROOT ─────────────────────────────────────────────────────────────────────
+[node name="Round6_MemoryTiles" type="Node3D"]
+script = ExtResource("1_memory")
+round_name = "ROUND 6: MEMORY TILES"
+time_limit = 120.0
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Env_1")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.866025, -0.353553, 0.353553, 0, 0.707107, 0.707107, -0.5, -0.612372, 0.612372, 0, 20, 0)
+light_color = Color(0.8, 0.6, 1.0, 1.0)
+light_energy = 1.0
+shadow_enabled = true
+
+; ─── SPAWN & ZONES ────────────────────────────────────────────────────────────
+[node name="SpawnPoint" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.0, 12.0)
+
+; Kill zone is deep (Y = -22) so the player has time to fall visually
+[node name="KillZone" type="Area3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -22.0, 0)
+collision_mask = 2
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="KillZone"]
+shape = SubResource("Shape_Kill")
+
+[node name="FinishZone" type="Area3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.0, -20.0)
+collision_mask = 2
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="FinishZone"]
+shape = SubResource("Shape_Finish")
+
+; ─── MAP GEOMETRY ─────────────────────────────────────────────────────────────
+[node name="MapGeometry" type="CSGCombiner3D" parent="."]
+use_collision = true
+
+[node name="StartPlatform" type="CSGBox3D" parent="MapGeometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 12.0)
+size = Vector3(14, 1, 6)
+material = SubResource("Mat_Platform")
+
+[node name="FinishPlatform" type="CSGBox3D" parent="MapGeometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, -20.0)
+size = Vector3(10, 1, 6)
+material = SubResource("Mat_Gold")
+
+[node name="FinishBridge" type="CSGBox3D" parent="MapGeometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, -12.0)
+size = Vector3(4, 1, 10)
+visible = false
+use_collision = false
+
+; ─── BIG DISPLAY SCREEN ──────────────────────────────────────────────────────
+[node name="Screen" type="CSGBox3D" parent="MapGeometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5.5, -14.5)
+size = Vector3(18, 10, 1)
+material = SubResource("Mat_Screen")
+
+[node name="ScreenLabel" type="Label3D" parent="MapGeometry/Screen"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, 0.6)
+text = "WAITING..."
+font_size = 100
+outline_size = 16
+modulate = Color(1.0, 0.85, 1.0, 1.0)
+
+; ─── ABYSS PLANE (covers the void under the tiles to prevent graphical glitches) ─
+; This large dark box sits at Y=-12, filling everything below with a dark purple.
+; The fog above + this plane means falling players see a clean thematic void,
+; not engine background seeping through.
+[node name="AbyssPlane" type="CSGBox3D" parent="MapGeometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -13.5, 0)
+size = Vector3(200, 3, 200)
+use_collision = false
+material = SubResource("Mat_Abyss")
+
+; ─── TILES ────────────────────────────────────────────────────────────────────
+[node name="Tiles" type="Node3D" parent="."]
+
+[node name="Tile1" type="AnimatableBody3D" parent="Tiles"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, -0.25, -4)
+collision_layer = 1
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Tiles/Tile1"]
+shape = SubResource("Shape_Tile")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Tiles/Tile1"]
+mesh = SubResource("Mesh_Tile")
+surface_material_override/0 = SubResource("Mat_Tile")
+
+[node name="Label3D" type="Label3D" parent="Tiles/Tile1"]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0.26, 0)
+text = ""
+font_size = 64
+outline_size = 12
+visible = false
+
+[node name="Tile2" type="AnimatableBody3D" parent="Tiles"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.25, -4)
+collision_layer = 1
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Tiles/Tile2"]
+shape = SubResource("Shape_Tile")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Tiles/Tile2"]
+mesh = SubResource("Mesh_Tile")
+surface_material_override/0 = SubResource("Mat_Tile")
+
+[node name="Label3D" type="Label3D" parent="Tiles/Tile2"]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0.26, 0)
+text = ""
+font_size = 64
+outline_size = 12
+visible = false
+
+[node name="Tile3" type="AnimatableBody3D" parent="Tiles"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, -0.25, -4)
+collision_layer = 1
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Tiles/Tile3"]
+shape = SubResource("Shape_Tile")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Tiles/Tile3"]
+mesh = SubResource("Mesh_Tile")
+surface_material_override/0 = SubResource("Mat_Tile")
+
+[node name="Label3D" type="Label3D" parent="Tiles/Tile3"]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0.26, 0)
+text = ""
+font_size = 64
+outline_size = 12
+visible = false
+
+[node name="Tile4" type="AnimatableBody3D" parent="Tiles"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, -0.25, 0)
+collision_layer = 1
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Tiles/Tile4"]
+shape = SubResource("Shape_Tile")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Tiles/Tile4"]
+mesh = SubResource("Mesh_Tile")
+surface_material_override/0 = SubResource("Mat_Tile")
+
+[node name="Label3D" type="Label3D" parent="Tiles/Tile4"]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0.26, 0)
+text = ""
+font_size = 64
+outline_size = 12
+visible = false
+
+[node name="Tile5" type="AnimatableBody3D" parent="Tiles"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.25, 0)
+collision_layer = 1
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Tiles/Tile5"]
+shape = SubResource("Shape_Tile")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Tiles/Tile5"]
+mesh = SubResource("Mesh_Tile")
+surface_material_override/0 = SubResource("Mat_Tile")
+
+[node name="Label3D" type="Label3D" parent="Tiles/Tile5"]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0.26, 0)
+text = ""
+font_size = 64
+outline_size = 12
+visible = false
+
+[node name="Tile6" type="AnimatableBody3D" parent="Tiles"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, -0.25, 0)
+collision_layer = 1
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Tiles/Tile6"]
+shape = SubResource("Shape_Tile")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Tiles/Tile6"]
+mesh = SubResource("Mesh_Tile")
+surface_material_override/0 = SubResource("Mat_Tile")
+
+[node name="Label3D" type="Label3D" parent="Tiles/Tile6"]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0.26, 0)
+text = ""
+font_size = 64
+outline_size = 12
+visible = false
+
+[node name="Tile7" type="AnimatableBody3D" parent="Tiles"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, -0.25, 4)
+collision_layer = 1
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Tiles/Tile7"]
+shape = SubResource("Shape_Tile")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Tiles/Tile7"]
+mesh = SubResource("Mesh_Tile")
+surface_material_override/0 = SubResource("Mat_Tile")
+
+[node name="Label3D" type="Label3D" parent="Tiles/Tile7"]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0.26, 0)
+text = ""
+font_size = 64
+outline_size = 12
+visible = false
+
+[node name="Tile8" type="AnimatableBody3D" parent="Tiles"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.25, 4)
+collision_layer = 1
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Tiles/Tile8"]
+shape = SubResource("Shape_Tile")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Tiles/Tile8"]
+mesh = SubResource("Mesh_Tile")
+surface_material_override/0 = SubResource("Mat_Tile")
+
+[node name="Label3D" type="Label3D" parent="Tiles/Tile8"]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0.26, 0)
+text = ""
+font_size = 64
+outline_size = 12
+visible = false
+
+[node name="Tile9" type="AnimatableBody3D" parent="Tiles"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, -0.25, 4)
+collision_layer = 1
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Tiles/Tile9"]
+shape = SubResource("Shape_Tile")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Tiles/Tile9"]
+mesh = SubResource("Mesh_Tile")
+surface_material_override/0 = SubResource("Mat_Tile")
+
+[node name="Label3D" type="Label3D" parent="Tiles/Tile9"]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0.26, 0)
+text = ""
+font_size = 64
+outline_size = 12
+visible = false

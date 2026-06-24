@@ -1,0 +1,819 @@
+[gd_scene load_steps=18 format=3 uid="uid://dash_main"]
+
+[ext_resource type="Script" path="res://scripts/Dashboard.gd" id="1_dash"]
+
+; ══════════════════════════════════════════════════════════════════════════════
+; STYLES
+; ══════════════════════════════════════════════════════════════════════════════
+
+[sub_resource type="StyleBoxFlat" id="SB_bg"]
+bg_color = Color(0.06, 0.08, 0.11, 1.0)
+
+[sub_resource type="StyleBoxFlat" id="SB_topbar"]
+bg_color = Color(0.09, 0.11, 0.15, 1.0)
+border_width_bottom = 1
+border_color = Color(0.18, 0.22, 0.28, 1.0)
+
+[sub_resource type="StyleBoxFlat" id="SB_sidebar"]
+bg_color = Color(0.09, 0.11, 0.15, 1.0)
+border_width_right = 1
+border_color = Color(0.18, 0.22, 0.28, 1.0)
+
+[sub_resource type="StyleBoxFlat" id="SB_card"]
+bg_color = Color(0.11, 0.14, 0.19, 1.0)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.2, 0.25, 0.35, 0.5)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+shadow_color = Color(0.0, 0.0, 0.0, 0.2)
+shadow_size = 10
+shadow_offset = Vector2(0, 4)
+
+[sub_resource type="StyleBoxFlat" id="SB_play_card"]
+bg_color = Color(0.13, 0.18, 0.26, 1.0)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.32, 0.66, 0.66, 0.5)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+
+[sub_resource type="StyleBoxFlat" id="SB_nav_n"]
+bg_color = Color(0.0, 0.0, 0.0, 0.0)
+content_margin_left = 24.0
+
+[sub_resource type="StyleBoxFlat" id="SB_nav_h"]
+bg_color = Color(0.15, 0.18, 0.25, 0.5)
+content_margin_left = 24.0
+
+[sub_resource type="StyleBoxFlat" id="SB_xp_bg"]
+bg_color = Color(0.05, 0.07, 0.10, 1.0)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="SB_xp_fill"]
+bg_color = Color(0.32, 0.66, 0.66, 1.0)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="SB_btn_primary_n"]
+bg_color = Color(0.32, 0.66, 0.66, 1.0)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="SB_btn_primary_h"]
+bg_color = Color(0.40, 0.75, 0.75, 1.0)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="SB_modal_bg"]
+bg_color = Color(0.04, 0.05, 0.08, 0.9)
+
+[sub_resource type="StyleBoxFlat" id="SB_modal_card"]
+bg_color = Color(0.1, 0.13, 0.18, 1.0)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.3, 0.5, 0.6, 0.6)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+expand_margin_left = 12.0
+expand_margin_top = 12.0
+expand_margin_right = 12.0
+expand_margin_bottom = 12.0
+
+[sub_resource type="StyleBoxFlat" id="SB_btn_close"]
+bg_color = Color(0.2, 0.25, 0.3, 1.0)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="ParticleProcessMaterial" id="PM_snow"]
+direction = Vector3(0.10, 1.0, 0.0)
+spread = 50.0
+gravity = Vector3(0.0, 20.0, 0.0)
+initial_velocity_min = 10.0
+initial_velocity_max = 30.0
+scale_min = 1.0
+scale_max = 3.0
+color = Color(0.88, 0.95, 1.0, 0.3)
+
+; ══════════════════════════════════════════════════════════════════════════════
+; SCENE TREE
+; ══════════════════════════════════════════════════════════════════════════════
+
+[node name="Dashboard" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_dash")
+
+[node name="Background" type="PanelContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("SB_bg")
+
+[node name="SnowParticles" type="GPUParticles2D" parent="."]
+position = Vector2(960, -10)
+amount = 150
+lifetime = 10.0
+process_material = SubResource("PM_snow")
+visibility_rect = Rect2(-1000, -60, 2000, 1200)
+
+[node name="MainVBox" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 0
+
+; ── TOP BAR ───────────────────────────────────────────────────────────────────
+[node name="TopBar" type="PanelContainer" parent="MainVBox"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 64)
+theme_override_styles/panel = SubResource("SB_topbar")
+
+[node name="Margin" type="MarginContainer" parent="MainVBox/TopBar"]
+layout_mode = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 0
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 0
+
+[node name="HBox" type="HBoxContainer" parent="MainVBox/TopBar/Margin"]
+layout_mode = 2
+
+[node name="LogoLabel" type="Label" parent="MainVBox/TopBar/Margin/HBox"]
+layout_mode = 2
+text = "🏔 YetiRal"
+theme_override_font_sizes/font_size = 22
+theme_override_colors/font_color = Color(1.0, 1.0, 1.0, 1.0)
+
+[node name="NavSpacer" type="Control" parent="MainVBox/TopBar/Margin/HBox"]
+layout_mode = 2
+custom_minimum_size = Vector2(32, 0)
+
+[node name="TopNav" type="HBoxContainer" parent="MainVBox/TopBar/Margin/HBox"]
+layout_mode = 2
+theme_override_constants/separation = 24
+
+[node name="Label1" type="Label" parent="MainVBox/TopBar/Margin/HBox/TopNav"]
+layout_mode = 2
+text = "Dashboard"
+theme_override_font_sizes/font_size = 13
+theme_override_colors/font_color = Color(1.0, 1.0, 1.0, 1.0)
+
+[node name="Label2" type="Label" parent="MainVBox/TopBar/Margin/HBox/TopNav"]
+layout_mode = 2
+text = "Leaderboards"
+theme_override_font_sizes/font_size = 13
+theme_override_colors/font_color = Color(0.6, 0.65, 0.7, 1.0)
+
+[node name="Label3" type="Label" parent="MainVBox/TopBar/Margin/HBox/TopNav"]
+layout_mode = 2
+text = "Events"
+theme_override_font_sizes/font_size = 13
+theme_override_colors/font_color = Color(0.6, 0.65, 0.7, 1.0)
+
+[node name="Spacer" type="Control" parent="MainVBox/TopBar/Margin/HBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="RightSide" type="HBoxContainer" parent="MainVBox/TopBar/Margin/HBox"]
+layout_mode = 2
+theme_override_constants/separation = 24
+
+[node name="Money" type="Label" parent="MainVBox/TopBar/Margin/HBox/RightSide"]
+layout_mode = 2
+text = "$4,200"
+theme_override_font_sizes/font_size = 14
+theme_override_colors/font_color = Color(1.0, 1.0, 1.0, 1.0)
+
+[node name="TopProfileName" type="Label" parent="MainVBox/TopBar/Margin/HBox/RightSide"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "User"
+theme_override_font_sizes/font_size = 14
+theme_override_colors/font_color = Color(0.32, 0.66, 0.66, 1.0)
+
+; ── BODY ──────────────────────────────────────────────────────────────────────
+[node name="BodyHBox" type="HBoxContainer" parent="MainVBox"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 0
+
+; ── SIDEBAR ──────────────────────────────
+[node name="Sidebar" type="PanelContainer" parent="MainVBox/BodyHBox"]
+layout_mode = 2
+custom_minimum_size = Vector2(240, 0)
+theme_override_styles/panel = SubResource("SB_sidebar")
+
+[node name="Margin" type="MarginContainer" parent="MainVBox/BodyHBox/Sidebar"]
+layout_mode = 2
+theme_override_constants/margin_left = 0
+theme_override_constants/margin_top = 24
+theme_override_constants/margin_right = 0
+theme_override_constants/margin_bottom = 24
+
+[node name="VBox" type="VBoxContainer" parent="MainVBox/BodyHBox/Sidebar/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 24
+
+[node name="SideProfileHBox" type="HBoxContainer" parent="MainVBox/BodyHBox/Sidebar/Margin/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Spacer" type="Control" parent="MainVBox/BodyHBox/Sidebar/Margin/VBox/SideProfileHBox"]
+layout_mode = 2
+custom_minimum_size = Vector2(16, 0)
+
+[node name="Avatar" type="ColorRect" parent="MainVBox/BodyHBox/Sidebar/Margin/VBox/SideProfileHBox"]
+layout_mode = 2
+custom_minimum_size = Vector2(40, 40)
+color = Color(0.2, 0.3, 0.4, 1.0)
+
+[node name="V" type="VBoxContainer" parent="MainVBox/BodyHBox/Sidebar/Margin/VBox/SideProfileHBox"]
+layout_mode = 2
+
+[node name="SideProfileName" type="Label" parent="MainVBox/BodyHBox/Sidebar/Margin/VBox/SideProfileHBox/V"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "User"
+theme_override_font_sizes/font_size = 15
+theme_override_colors/font_color = Color(1.0, 1.0, 1.0, 1.0)
+
+[node name="RankLabel" type="Label" parent="MainVBox/BodyHBox/Sidebar/Margin/VBox/SideProfileHBox/V"]
+layout_mode = 2
+text = "Himalayan Master"
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_color = Color(0.6, 0.65, 0.7, 1.0)
+
+[node name="NavBtns" type="VBoxContainer" parent="MainVBox/BodyHBox/Sidebar/Margin/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="NavBtnLobby" type="Button" parent="MainVBox/BodyHBox/Sidebar/Margin/VBox/NavBtns"]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(0, 48)
+text = "Lobby"
+alignment = 0
+theme_override_styles/normal = SubResource("SB_nav_n")
+theme_override_styles/hover = SubResource("SB_nav_h")
+theme_override_styles/pressed = SubResource("SB_nav_h")
+theme_override_styles/focus = SubResource("SB_nav_n")
+theme_override_colors/font_color = Color(0.8, 0.85, 0.9, 1.0)
+
+[node name="NavBtnProfile" type="Button" parent="MainVBox/BodyHBox/Sidebar/Margin/VBox/NavBtns"]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(0, 48)
+text = "Profile"
+alignment = 0
+theme_override_styles/normal = SubResource("SB_nav_n")
+theme_override_styles/hover = SubResource("SB_nav_h")
+theme_override_styles/pressed = SubResource("SB_nav_h")
+theme_override_styles/focus = SubResource("SB_nav_n")
+theme_override_colors/font_color = Color(0.8, 0.85, 0.9, 1.0)
+
+[node name="NavBtnStore" type="Button" parent="MainVBox/BodyHBox/Sidebar/Margin/VBox/NavBtns"]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(0, 48)
+text = "Store"
+alignment = 0
+theme_override_styles/normal = SubResource("SB_nav_n")
+theme_override_styles/hover = SubResource("SB_nav_h")
+theme_override_styles/pressed = SubResource("SB_nav_h")
+theme_override_styles/focus = SubResource("SB_nav_n")
+theme_override_colors/font_color = Color(0.8, 0.85, 0.9, 1.0)
+
+[node name="NavBtnSocial" type="Button" parent="MainVBox/BodyHBox/Sidebar/Margin/VBox/NavBtns"]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(0, 48)
+text = "Social"
+alignment = 0
+theme_override_styles/normal = SubResource("SB_nav_n")
+theme_override_styles/hover = SubResource("SB_nav_h")
+theme_override_styles/pressed = SubResource("SB_nav_h")
+theme_override_styles/focus = SubResource("SB_nav_n")
+theme_override_colors/font_color = Color(0.8, 0.85, 0.9, 1.0)
+
+[node name="NavBtnSettings" type="Button" parent="MainVBox/BodyHBox/Sidebar/Margin/VBox/NavBtns"]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(0, 48)
+text = "Settings"
+alignment = 0
+theme_override_styles/normal = SubResource("SB_nav_n")
+theme_override_styles/hover = SubResource("SB_nav_h")
+theme_override_styles/pressed = SubResource("SB_nav_h")
+theme_override_styles/focus = SubResource("SB_nav_n")
+theme_override_colors/font_color = Color(0.8, 0.85, 0.9, 1.0)
+
+[node name="Spacer" type="Control" parent="MainVBox/BodyHBox/Sidebar/Margin/VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="NavBtnLogout" type="Button" parent="MainVBox/BodyHBox/Sidebar/Margin/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(0, 48)
+text = "Log Out"
+alignment = 0
+theme_override_styles/normal = SubResource("SB_nav_n")
+theme_override_styles/hover = SubResource("SB_nav_h")
+theme_override_styles/pressed = SubResource("SB_nav_h")
+theme_override_styles/focus = SubResource("SB_nav_n")
+theme_override_colors/font_color = Color(0.8, 0.3, 0.3, 1.0)
+
+; ── MAIN CONTENT AREA ──────────────────────────
+[node name="ContentMargin" type="MarginContainer" parent="MainVBox/BodyHBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 32
+theme_override_constants/margin_top = 32
+theme_override_constants/margin_right = 32
+theme_override_constants/margin_bottom = 32
+
+; ── 1. LOBBY VIEW ──────────────────
+[node name="LobbyView" type="HBoxContainer" parent="MainVBox/BodyHBox/ContentMargin"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 24
+
+[node name="LeftCol" type="VBoxContainer" parent="MainVBox/BodyHBox/ContentMargin/LobbyView"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 1.6
+theme_override_constants/separation = 24
+
+[node name="ProfileCard" type="PanelContainer" parent="MainVBox/BodyHBox/ContentMargin/LobbyView/LeftCol"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 260)
+theme_override_styles/panel = SubResource("SB_card")
+
+[node name="Margin" type="MarginContainer" parent="MainVBox/BodyHBox/ContentMargin/LobbyView/LeftCol/ProfileCard"]
+layout_mode = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 24
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 24
+
+[node name="Label" type="Label" parent="MainVBox/BodyHBox/ContentMargin/LobbyView/LeftCol/ProfileCard/Margin"]
+layout_mode = 2
+text = "[ Massive Player Identity Card ]
+Shows Big Avatar, XP Bar, Level"
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.5, 0.55, 0.6, 1.0)
+
+[node name="BottomRow" type="HBoxContainer" parent="MainVBox/BodyHBox/ContentMargin/LobbyView/LeftCol"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 24
+
+[node name="RewardsCard" type="PanelContainer" parent="MainVBox/BodyHBox/ContentMargin/LobbyView/LeftCol/BottomRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("SB_card")
+
+[node name="Label" type="Label" parent="MainVBox/BodyHBox/ContentMargin/LobbyView/LeftCol/BottomRow/RewardsCard"]
+layout_mode = 2
+text = "Daily Rewards"
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.5, 0.55, 0.6, 1.0)
+
+[node name="ChallengesCard" type="PanelContainer" parent="MainVBox/BodyHBox/ContentMargin/LobbyView/LeftCol/BottomRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("SB_card")
+
+[node name="Label" type="Label" parent="MainVBox/BodyHBox/ContentMargin/LobbyView/LeftCol/BottomRow/ChallengesCard"]
+layout_mode = 2
+text = "Challenges"
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.5, 0.55, 0.6, 1.0)
+
+[node name="RightCol" type="VBoxContainer" parent="MainVBox/BodyHBox/ContentMargin/LobbyView"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 24
+
+[node name="QuickPlayCard" type="PanelContainer" parent="MainVBox/BodyHBox/ContentMargin/LobbyView/RightCol"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 180)
+theme_override_styles/panel = SubResource("SB_play_card")
+
+[node name="QuickPlayBtn" type="Button" parent="MainVBox/BodyHBox/ContentMargin/LobbyView/RightCol/QuickPlayCard"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "▶  QUICK PLAY"
+flat = true
+theme_override_font_sizes/font_size = 28
+theme_override_colors/font_color = Color(1.0, 1.0, 1.0, 1.0)
+
+[node name="SeasonCard" type="PanelContainer" parent="MainVBox/BodyHBox/ContentMargin/LobbyView/RightCol"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 80)
+theme_override_styles/panel = SubResource("SB_card")
+
+[node name="Label" type="Label" parent="MainVBox/BodyHBox/ContentMargin/LobbyView/RightCol/SeasonCard"]
+layout_mode = 2
+text = "Season 4"
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.5, 0.55, 0.6, 1.0)
+
+[node name="SocialCard" type="PanelContainer" parent="MainVBox/BodyHBox/ContentMargin/LobbyView/RightCol"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("SB_card")
+
+[node name="Label" type="Label" parent="MainVBox/BodyHBox/ContentMargin/LobbyView/RightCol/SocialCard"]
+layout_mode = 2
+text = "Social / Friends"
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.5, 0.55, 0.6, 1.0)
+
+; ── 2. PROFILE VIEW ──────────────────
+[node name="ProfileView" type="VBoxContainer" parent="MainVBox/BodyHBox/ContentMargin"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 24
+
+[node name="Title" type="Label" parent="MainVBox/BodyHBox/ContentMargin/ProfileView"]
+layout_mode = 2
+text = "Player Profile"
+theme_override_font_sizes/font_size = 28
+theme_override_colors/font_color = Color(1.0, 1.0, 1.0, 1.0)
+
+[node name="ProfileCard" type="PanelContainer" parent="MainVBox/BodyHBox/ContentMargin/ProfileView"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("SB_card")
+
+[node name="Margin" type="MarginContainer" parent="MainVBox/BodyHBox/ContentMargin/ProfileView/ProfileCard"]
+layout_mode = 2
+theme_override_constants/margin_left = 32
+theme_override_constants/margin_top = 32
+
+[node name="VBox" type="VBoxContainer" parent="MainVBox/BodyHBox/ContentMargin/ProfileView/ProfileCard/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="ProfileViewName" type="Label" parent="MainVBox/BodyHBox/ContentMargin/ProfileView/ProfileCard/Margin/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "User"
+theme_override_font_sizes/font_size = 36
+theme_override_colors/font_color = Color(0.32, 0.66, 0.66, 1.0)
+
+[node name="StatsLabel" type="Label" parent="MainVBox/BodyHBox/ContentMargin/ProfileView/ProfileCard/Margin/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Matches Played: 0
+Win Rate: 0%
+Join Date: June 2026"
+theme_override_font_sizes/font_size = 16
+theme_override_colors/font_color = Color(0.8, 0.85, 0.9, 1.0)
+
+; ── 3. STORE VIEW ──────────────────
+[node name="StoreView" type="VBoxContainer" parent="MainVBox/BodyHBox/ContentMargin"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+
+[node name="Title" type="Label" parent="MainVBox/BodyHBox/ContentMargin/StoreView"]
+layout_mode = 2
+text = "Expedition Store"
+theme_override_font_sizes/font_size = 28
+theme_override_colors/font_color = Color(1.0, 1.0, 1.0, 1.0)
+
+[node name="Label" type="Label" parent="MainVBox/BodyHBox/ContentMargin/StoreView"]
+layout_mode = 2
+size_flags_vertical = 3
+text = "[ Store items and bundles will appear here ]"
+horizontal_alignment = 1
+vertical_alignment = 1
+theme_override_colors/font_color = Color(0.5, 0.55, 0.6, 1.0)
+
+; ── 4. SETTINGS VIEW ──────────────────
+[node name="SettingsView" type="VBoxContainer" parent="MainVBox/BodyHBox/ContentMargin"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+
+[node name="Title" type="Label" parent="MainVBox/BodyHBox/ContentMargin/SettingsView"]
+layout_mode = 2
+text = "Settings"
+theme_override_font_sizes/font_size = 28
+theme_override_colors/font_color = Color(1.0, 1.0, 1.0, 1.0)
+
+[node name="Label" type="Label" parent="MainVBox/BodyHBox/ContentMargin/SettingsView"]
+layout_mode = 2
+size_flags_vertical = 3
+text = "[ Video, Audio, Gameplay controls here ]"
+horizontal_alignment = 1
+vertical_alignment = 1
+theme_override_colors/font_color = Color(0.5, 0.55, 0.6, 1.0)
+
+; ── 5. SOCIAL VIEW ──────────────────
+[node name="SocialView" type="VBoxContainer" parent="MainVBox/BodyHBox/ContentMargin"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 24
+
+[node name="Title" type="Label" parent="MainVBox/BodyHBox/ContentMargin/SocialView"]
+layout_mode = 2
+text = "Social & Friends"
+theme_override_font_sizes/font_size = 28
+theme_override_colors/font_color = Color(1.0, 1.0, 1.0, 1.0)
+
+[node name="SocialCard" type="PanelContainer" parent="MainVBox/BodyHBox/ContentMargin/SocialView"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("SB_card")
+
+[node name="Margin" type="MarginContainer" parent="MainVBox/BodyHBox/ContentMargin/SocialView/SocialCard"]
+layout_mode = 2
+theme_override_constants/margin_left = 32
+theme_override_constants/margin_top = 32
+theme_override_constants/margin_right = 32
+theme_override_constants/margin_bottom = 32
+
+[node name="HBox" type="HBoxContainer" parent="MainVBox/BodyHBox/ContentMargin/SocialView/SocialCard/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 32
+
+[node name="LeftCol" type="VBoxContainer" parent="MainVBox/BodyHBox/ContentMargin/SocialView/SocialCard/Margin/HBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 16
+
+[node name="MyUIDLabel" type="Label" parent="MainVBox/BodyHBox/ContentMargin/SocialView/SocialCard/Margin/HBox/LeftCol"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Your UID: "
+theme_override_font_sizes/font_size = 20
+theme_override_colors/font_color = Color(0.32, 0.66, 0.66, 1.0)
+
+[node name="AddFriendSection" type="VBoxContainer" parent="MainVBox/BodyHBox/ContentMargin/SocialView/SocialCard/Margin/HBox/LeftCol"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="AddFriendLabel" type="Label" parent="MainVBox/BodyHBox/ContentMargin/SocialView/SocialCard/Margin/HBox/LeftCol/AddFriendSection"]
+layout_mode = 2
+text = "Add Friend by UID"
+theme_override_font_sizes/font_size = 14
+
+[node name="FriendHBox" type="HBoxContainer" parent="MainVBox/BodyHBox/ContentMargin/SocialView/SocialCard/Margin/HBox/LeftCol/AddFriendSection"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="FriendUIDInput" type="LineEdit" parent="MainVBox/BodyHBox/ContentMargin/SocialView/SocialCard/Margin/HBox/LeftCol/AddFriendSection/FriendHBox"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "Enter Player UID"
+
+[node name="AddFriendBtn" type="Button" parent="MainVBox/BodyHBox/ContentMargin/SocialView/SocialCard/Margin/HBox/LeftCol/AddFriendSection/FriendHBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(120, 0)
+layout_mode = 2
+text = "Add Friend"
+
+[node name="SocialMsg" type="Label" parent="MainVBox/BodyHBox/ContentMargin/SocialView/SocialCard/Margin/HBox/LeftCol"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.4, 0.4, 1.0)
+
+[node name="Spacer" type="Control" parent="MainVBox/BodyHBox/ContentMargin/SocialView/SocialCard/Margin/HBox/LeftCol"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="RightCol" type="VBoxContainer" parent="MainVBox/BodyHBox/ContentMargin/SocialView/SocialCard/Margin/HBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 20
+
+[node name="RequestsLabel" type="Label" parent="MainVBox/BodyHBox/ContentMargin/SocialView/SocialCard/Margin/HBox/RightCol"]
+layout_mode = 2
+text = "Friend Requests"
+theme_override_font_sizes/font_size = 18
+
+[node name="RequestsScroll" type="ScrollContainer" parent="MainVBox/BodyHBox/ContentMargin/SocialView/SocialCard/Margin/HBox/RightCol"]
+custom_minimum_size = Vector2(0, 150)
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="RequestsVBox" type="VBoxContainer" parent="MainVBox/BodyHBox/ContentMargin/SocialView/SocialCard/Margin/HBox/RightCol/RequestsScroll"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="FriendsLabel" type="Label" parent="MainVBox/BodyHBox/ContentMargin/SocialView/SocialCard/Margin/HBox/RightCol"]
+layout_mode = 2
+text = "Friends List"
+theme_override_font_sizes/font_size = 18
+
+[node name="FriendsScroll" type="ScrollContainer" parent="MainVBox/BodyHBox/ContentMargin/SocialView/SocialCard/Margin/HBox/RightCol"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="FriendsVBox" type="VBoxContainer" parent="MainVBox/BodyHBox/ContentMargin/SocialView/SocialCard/Margin/HBox/RightCol/FriendsScroll"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+; ══════════════════════════════════════════════════════════════════════════════
+; GAME MODE MODAL
+; ══════════════════════════════════════════════════════════════════════════════
+[node name="GameModeModal" type="ColorRect" parent="."]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.04, 0.05, 0.08, 0.85)
+
+[node name="Center" type="CenterContainer" parent="GameModeModal"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel" type="PanelContainer" parent="GameModeModal/Center"]
+layout_mode = 2
+custom_minimum_size = Vector2(400, 0)
+theme_override_styles/panel = SubResource("SB_modal_card")
+
+[node name="Margin" type="MarginContainer" parent="GameModeModal/Center/Panel"]
+layout_mode = 2
+theme_override_constants/margin_left = 32
+theme_override_constants/margin_top = 32
+theme_override_constants/margin_right = 32
+theme_override_constants/margin_bottom = 32
+
+[node name="VBox" type="VBoxContainer" parent="GameModeModal/Center/Panel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 24
+
+[node name="ModeSelectBox" type="VBoxContainer" parent="GameModeModal/Center/Panel/Margin/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 24
+
+[node name="Title" type="Label" parent="GameModeModal/Center/Panel/Margin/VBox/ModeSelectBox"]
+layout_mode = 2
+text = "Select Game Mode"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 22
+theme_override_colors/font_color = Color(1.0, 1.0, 1.0, 1.0)
+
+[node name="SinglePlayerBtn" type="Button" parent="GameModeModal/Center/Panel/Margin/VBox/ModeSelectBox"]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(0, 60)
+text = "Single Player"
+theme_override_styles/normal = SubResource("SB_btn_primary_n")
+theme_override_styles/hover = SubResource("SB_btn_primary_h")
+theme_override_colors/font_color = Color(0.0, 0.0, 0.0, 1.0)
+theme_override_font_sizes/font_size = 18
+
+[node name="MultiplayerBtn" type="Button" parent="GameModeModal/Center/Panel/Margin/VBox/ModeSelectBox"]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(0, 60)
+text = "Multiplayer"
+theme_override_styles/normal = SubResource("SB_btn_primary_n")
+theme_override_styles/hover = SubResource("SB_btn_primary_h")
+theme_override_colors/font_color = Color(0.0, 0.0, 0.0, 1.0)
+theme_override_font_sizes/font_size = 18
+
+[node name="MultiplayerBox" type="VBoxContainer" parent="GameModeModal/Center/Panel/Margin/VBox"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 24
+
+[node name="Title" type="Label" parent="GameModeModal/Center/Panel/Margin/VBox/MultiplayerBox"]
+layout_mode = 2
+text = "Multiplayer"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 22
+
+[node name="CreateRoomBtn" type="Button" parent="GameModeModal/Center/Panel/Margin/VBox/MultiplayerBox"]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(0, 60)
+text = "Create Room"
+theme_override_styles/normal = SubResource("SB_btn_primary_n")
+theme_override_styles/hover = SubResource("SB_btn_primary_h")
+theme_override_colors/font_color = Color(0.0, 0.0, 0.0, 1.0)
+
+[node name="JoinCodeInput" type="LineEdit" parent="GameModeModal/Center/Panel/Margin/VBox/MultiplayerBox"]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(0, 50)
+placeholder_text = "Enter Room Code"
+alignment = 1
+
+[node name="JoinRoomBtn" type="Button" parent="GameModeModal/Center/Panel/Margin/VBox/MultiplayerBox"]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(0, 60)
+text = "Join Room"
+theme_override_styles/normal = SubResource("SB_btn_primary_n")
+theme_override_styles/hover = SubResource("SB_btn_primary_h")
+theme_override_colors/font_color = Color(0.0, 0.0, 0.0, 1.0)
+
+[node name="MultiplayerMsg" type="Label" parent="GameModeModal/Center/Panel/Margin/VBox/MultiplayerBox"]
+unique_name_in_owner = true
+layout_mode = 2
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(1.0, 0.4, 0.4, 1.0)
+
+[node name="WaitingLobbyBox" type="VBoxContainer" parent="GameModeModal/Center/Panel/Margin/VBox"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 24
+
+[node name="Title" type="Label" parent="GameModeModal/Center/Panel/Margin/VBox/WaitingLobbyBox"]
+layout_mode = 2
+text = "Room Lobby"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 22
+
+[node name="RoomCodeDisplay" type="Label" parent="GameModeModal/Center/Panel/Margin/VBox/WaitingLobbyBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Code: "
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.32, 0.66, 0.66, 1.0)
+
+[node name="PlayerCountLabel" type="Label" parent="GameModeModal/Center/Panel/Margin/VBox/WaitingLobbyBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Players: 1/5"
+horizontal_alignment = 1
+
+[node name="LobbyPlayersList" type="VBoxContainer" parent="GameModeModal/Center/Panel/Margin/VBox/WaitingLobbyBox"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="StartMatchBtn" type="Button" parent="GameModeModal/Center/Panel/Margin/VBox/WaitingLobbyBox"]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(0, 60)
+text = "Start Match (Needs 3+)"
+disabled = true
+theme_override_styles/normal = SubResource("SB_btn_primary_n")
+theme_override_styles/hover = SubResource("SB_btn_primary_h")
+theme_override_colors/font_color = Color(0.0, 0.0, 0.0, 1.0)
+
+[node name="CloseModalBtn" type="Button" parent="GameModeModal/Center/Panel/Margin/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(0, 40)
+text = "Back / Cancel"
+theme_override_styles/normal = SubResource("SB_btn_close")
+theme_override_colors/font_color = Color(0.7, 0.75, 0.8, 1.0)

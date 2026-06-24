@@ -1,0 +1,124 @@
+[gd_scene load_steps=8 format=3 uid="uid://gameoverscreen_scene"]
+
+[ext_resource type="Script" path="res://scripts/GameOverScreen.gd" id="1_gameover"]
+
+[sub_resource type="StyleBoxFlat" id="SB_BG"]
+bg_color = Color(0.08, 0.02, 0.02, 1.0)
+
+[sub_resource type="StyleBoxFlat" id="SB_BtnTryAgain"]
+bg_color = Color(0.7, 0.15, 0.15, 1.0)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.9, 0.3, 0.3, 1.0)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="SB_BtnTryAgainHover"]
+bg_color = Color(0.85, 0.2, 0.2, 1.0)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(1.0, 0.5, 0.5, 1.0)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="SB_BtnLobby"]
+bg_color = Color(0.12, 0.15, 0.18, 1.0)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.24, 0.28, 0.35, 1.0)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="SB_BtnLobbyHover"]
+bg_color = Color(0.18, 0.22, 0.28, 1.0)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.35, 0.42, 0.5, 1.0)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[node name="GameOverScreen" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_gameover")
+
+[node name="Background" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("SB_BG")
+
+[node name="CenterContainer" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBox" type="VBoxContainer" parent="CenterContainer"]
+layout_mode = 2
+theme_override_constants/separation = 40
+alignment = 1
+
+[node name="Title" type="Label" parent="CenterContainer/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.15, 0.15, 1.0)
+theme_override_font_sizes/font_size = 80
+text = "ELIMINATED!"
+horizontal_alignment = 1
+
+[node name="MomosCollectedLabel" type="Label" parent="CenterContainer/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "🥟 MOMOS COLLECTED: 0"
+horizontal_alignment = 1
+
+[node name="HBoxButtons" type="HBoxContainer" parent="CenterContainer/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 24
+alignment = 1
+
+[node name="TryAgainBtn" type="Button" parent="CenterContainer/VBox/HBoxButtons"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(200, 60)
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = SubResource("SB_BtnTryAgain")
+theme_override_styles/hover = SubResource("SB_BtnTryAgainHover")
+theme_override_styles/pressed = SubResource("SB_BtnTryAgainHover")
+text = "TRY AGAIN"
+
+[node name="LobbyBtn" type="Button" parent="CenterContainer/VBox/HBoxButtons"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(200, 60)
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = SubResource("SB_BtnLobby")
+theme_override_styles/hover = SubResource("SB_BtnLobbyHover")
+theme_override_styles/pressed = SubResource("SB_BtnLobbyHover")
+text = "LOBBY"
