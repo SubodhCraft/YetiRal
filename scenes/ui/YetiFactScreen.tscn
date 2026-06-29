@@ -1,0 +1,118 @@
+[gd_scene format=3 uid="uid://bg0v7dyelvtqj"]
+
+[ext_resource type="Script" path="res://scripts/YetiFactScreen.gd" id="1_yfs"]
+
+[sub_resource type="StyleBoxFlat" id="SB_overlay"]
+bg_color = Color(0.03, 0.04, 0.08, 0.92)
+
+[sub_resource type="StyleBoxFlat" id="SB_card"]
+bg_color = Color(0.08, 0.10, 0.16, 1.0)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.32, 0.66, 0.66, 0.7)
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
+
+[sub_resource type="StyleBoxFlat" id="SB_bar_bg"]
+bg_color = Color(0.1, 0.12, 0.18, 1.0)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="SB_bar_fill"]
+bg_color = Color(0.32, 0.66, 0.66, 1.0)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[node name="YetiFactScreen" type="CanvasLayer"]
+script = ExtResource("1_yfs")
+
+[node name="Overlay" type="ColorRect" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.0, 0.0, 0.0, 0.0)
+
+[node name="Center" type="CenterContainer" parent="Overlay"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Card" type="PanelContainer" parent="Overlay/Center"]
+layout_mode = 2
+custom_minimum_size = Vector2(700, 0)
+theme_override_styles/panel = SubResource("SB_card")
+
+[node name="VBox" type="VBoxContainer" parent="Overlay/Center/Card"]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="Margin" type="MarginContainer" parent="Overlay/Center/Card/VBox"]
+layout_mode = 2
+theme_override_constants/margin_left = 48
+theme_override_constants/margin_top = 40
+theme_override_constants/margin_right = 48
+theme_override_constants/margin_bottom = 40
+
+[node name="InnerVBox" type="VBoxContainer" parent="Overlay/Center/Card/VBox/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="YetiEmoji" type="Label" parent="Overlay/Center/Card/VBox/Margin/InnerVBox"]
+layout_mode = 2
+text = "🏔 🦶❓"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 48
+
+[node name="TitleLabel" type="Label" parent="Overlay/Center/Card/VBox/Margin/InnerVBox"]
+layout_mode = 2
+text = "DID YOU KNOW?"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 22
+theme_override_colors/font_color = Color(0.32, 0.66, 0.66, 1.0)
+
+[node name="Divider" type="HSeparator" parent="Overlay/Center/Card/VBox/Margin/InnerVBox"]
+layout_mode = 2
+
+[node name="BodyLabel" type="Label" parent="Overlay/Center/Card/VBox/Margin/InnerVBox"]
+layout_mode = 2
+text = "..."
+horizontal_alignment = 1
+autowrap_mode = 3
+theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(0.88, 0.90, 0.95, 1.0)
+
+[node name="SourceLabel" type="Label" parent="Overlay/Center/Card/VBox/Margin/InnerVBox"]
+layout_mode = 2
+text = "— Source"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 13
+theme_override_colors/font_color = Color(0.5, 0.55, 0.65, 1.0)
+
+[node name="TimerBar" type="ProgressBar" parent="Overlay/Center/Card/VBox/Margin/InnerVBox"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 8)
+value = 7.0
+show_percentage = false
+theme_override_styles/background = SubResource("SB_bar_bg")
+theme_override_styles/fill = SubResource("SB_bar_fill")
+
+[node name="DismissLabel" type="Label" parent="Overlay/Center/Card/VBox/Margin/InnerVBox"]
+layout_mode = 2
+text = "Press SPACE to continue"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 12
+theme_override_colors/font_color = Color(0.4, 0.45, 0.55, 1.0)

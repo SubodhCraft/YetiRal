@@ -1,66 +1,46 @@
-[gd_scene format=3 uid="uid://de48610ic6bn5"]
+[gd_scene load_steps=5 format=3 uid="uid://cxab3player3d"]
 
-[ext_resource type="Script" uid="uid://5dgetoi6wnt0" path="res://scripts/Player3D.gd" id="1_player3d"]
+[ext_resource type="Script" path="res://scripts/Player3D.gd" id="1_xxx"]
+[ext_resource type="Script" path="res://scripts/YetiVisuals.gd" id="2_xxx"]
 
-[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_1"]
-height = 1.8
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_xxx"]
+radius = 0.38
+height = 1.1
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_Body"]
-albedo_color = Color(0.18, 0.62, 0.86, 1)
-roughness = 0.4
+[sub_resource type="BoxShape3D" id="BoxShape3D_xxx"]
+size = Vector3(0.4, 0.3, 0.4)
 
-[sub_resource type="CapsuleMesh" id="CapsuleMesh_1"]
-material = SubResource("StandardMaterial3D_Body")
-height = 1.8
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_Eye"]
-
-[sub_resource type="SphereMesh" id="SphereMesh_Eye"]
-material = SubResource("StandardMaterial3D_Eye")
-radius = 0.15
-height = 0.3
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_Pupil"]
-albedo_color = Color(0, 0, 0, 1)
-
-[sub_resource type="SphereMesh" id="SphereMesh_Pupil"]
-material = SubResource("StandardMaterial3D_Pupil")
-radius = 0.07
-height = 0.14
-
-[node name="Player3D" type="CharacterBody3D" unique_id=1856865512]
+[node name="Player3D" type="CharacterBody3D"]
 collision_layer = 2
-script = ExtResource("1_player3d")
+collision_mask = 3
+floor_stop_on_slope = true
+floor_max_angle = 0.8
+script = ExtResource("1_xxx")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=502419505]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
-shape = SubResource("CapsuleShape3D_1")
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.55, 0)
+shape = SubResource("CapsuleShape3D_xxx")
 
-[node name="Visuals" type="Node3D" parent="." unique_id=443108744]
+[node name="SpringArm3D" type="SpringArm3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.965926, 0.258819, 0, -0.258819, 0.965926, 0, 0.55, 0)
+collision_mask = 1
+spring_length = 5.0
 
-[node name="BodyMesh" type="MeshInstance3D" parent="Visuals" unique_id=1664067623]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
-mesh = SubResource("CapsuleMesh_1")
+[node name="Camera3D" type="Camera3D" parent="SpringArm3D"]
+near = 0.1
+far = 500.0
 
-[node name="EyeLeft" type="MeshInstance3D" parent="Visuals" unique_id=986280340]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.2, 1.3, -0.4)
-mesh = SubResource("SphereMesh_Eye")
+[node name="Visuals" type="Node3D" parent="."]
+script = ExtResource("2_xxx")
 
-[node name="PupilLeft" type="MeshInstance3D" parent="Visuals/EyeLeft" unique_id=575546554]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.1)
-mesh = SubResource("SphereMesh_Pupil")
+[node name="AnimationPlayer" type="AnimationPlayer" parent="Visuals"]
 
-[node name="EyeRight" type="MeshInstance3D" parent="Visuals" unique_id=1479654137]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.2, 1.3, -0.4)
-mesh = SubResource("SphereMesh_Eye")
+[node name="StepUpCast" type="ShapeCast3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.15, 0)
+shape = SubResource("BoxShape3D_xxx")
+target_position = Vector3(0, 0, -0.5)
+collision_mask = 1
 
-[node name="PupilRight" type="MeshInstance3D" parent="Visuals/EyeRight" unique_id=1967029931]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.1)
-mesh = SubResource("SphereMesh_Pupil")
-
-[node name="SpringArm3D" type="SpringArm3D" parent="." unique_id=591874765]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
-spring_length = 5.5
-
-[node name="Camera3D" type="Camera3D" parent="SpringArm3D" unique_id=2026944999]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.530869, 0.5, 2.8364296)
+[node name="FootstepAudio" type="AudioStreamPlayer3D" parent="."]
+unit_size = 5.0
+max_db = -6.0

@@ -85,10 +85,7 @@ albedo_color = Color(0.95, 0.8, 0.08, 1)
 roughness = 0.8
 
 [node name="Round1_HimalayanClimb" type="Node3D" unique_id=576132630]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
 script = ExtResource("1_climb")
-round_name = "ROUND 1: HIMALAYAN CLIMB"
-time_limit = 90.0
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1842087747]
 environment = SubResource("Env_1")
@@ -118,7 +115,7 @@ collision_mask = 2
 shape = SubResource("Shape_Kill")
 
 [node name="FinishZone" type="Area3D" parent="." unique_id=358301807]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 10.0, -100)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 10, -100)
 collision_mask = 2
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="FinishZone" unique_id=1804140069]
@@ -127,20 +124,17 @@ shape = SubResource("Shape_Finish")
 [node name="MapGeometry" type="CSGCombiner3D" parent="." unique_id=1340357204]
 use_collision = true
 
-; ── START ──────────────────────────────────────────────────────────────────
 [node name="StartPlatform" type="CSGBox3D" parent="MapGeometry" unique_id=199574557]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
 size = Vector3(12, 1, 10)
 material = SubResource("Mat_Snow")
 
-; ── SECTION 1: First gentle ramp ──────────────────────────────────────────
 [node name="Ramp1" type="CSGBox3D" parent="MapGeometry" unique_id=609743948]
 transform = Transform3D(1, 0, 0, 0, 0.984808, 0.173648, 0, -0.173648, 0.984808, 0, 1.39, -12)
 size = Vector3(10, 1, 16)
 material = SubResource("Mat_Snow")
 
-; First hurdle on the ramp (must jump over)
-[node name="Hurdle1" type="CSGBox3D" parent="MapGeometry"]
+[node name="Hurdle1" type="CSGBox3D" parent="MapGeometry" unique_id=1770290886]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.8, -10)
 size = Vector3(10, 1.5, 0.6)
 material = SubResource("Mat_Stone")
@@ -150,18 +144,16 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.28, -23)
 size = Vector3(20, 1, 8)
 material = SubResource("Mat_Snow")
 
-; Two hurdles on the mid platform, player must navigate between/over them
-[node name="Hurdle2" type="CSGBox3D" parent="MapGeometry"]
+[node name="Hurdle2" type="CSGBox3D" parent="MapGeometry" unique_id=1295815653]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.5, 3.8, -23)
-size = Vector3(7, 2.0, 0.6)
+size = Vector3(7, 2, 0.6)
 material = SubResource("Mat_Stone")
 
-[node name="Hurdle3" type="CSGBox3D" parent="MapGeometry"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.0, 3.8, -26)
-size = Vector3(6, 2.0, 0.6)
+[node name="Hurdle3" type="CSGBox3D" parent="MapGeometry" unique_id=451583430]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 3.8, -26)
+size = Vector3(6, 2, 0.6)
 material = SubResource("Mat_Stone")
 
-; ── SECTION 2: Split path ramps ───────────────────────────────────────────
 [node name="Ramp2Right" type="CSGBox3D" parent="MapGeometry" unique_id=667316158]
 transform = Transform3D(0.965926, -0.0454327, -0.254823, 0, 0.984808, -0.173648, 0.258819, 0.16773, 0.951251, 8, 4.17, -32)
 size = Vector3(6, 1, 16)
@@ -172,67 +164,61 @@ transform = Transform3D(0.965926, 0.0454327, 0.254823, 0, 0.984808, -0.173648, -
 size = Vector3(6, 1, 16)
 material = SubResource("Mat_Stone")
 
-; ── SECTION 3: Upper bridge with gap challenge ────────────────────────────
-; Gap between ramps and upper platform — player must jump across
-[node name="UpperBridge" type="CSGBox3D" parent="MapGeometry"]
+[node name="UpperBridge" type="CSGBox3D" parent="MapGeometry" unique_id=175319090]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.5, -45)
 size = Vector3(6, 1, 10)
 material = SubResource("Mat_SnowWarm")
 
-; Hurdle on the upper bridge
-[node name="Hurdle4" type="CSGBox3D" parent="MapGeometry"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8.0, -44)
+[node name="Hurdle4" type="CSGBox3D" parent="MapGeometry" unique_id=468201651]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8, -44)
 size = Vector3(6, 2.2, 0.6)
 material = SubResource("Mat_Stone")
 
-; ── SECTION 4: Narrow ledge run ───────────────────────────────────────────
-[node name="NarrowLedge" type="CSGBox3D" parent="MapGeometry"]
+[node name="NarrowLedge" type="CSGBox3D" parent="MapGeometry" unique_id=967573800]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.5, -57)
 size = Vector3(4, 1, 16)
 material = SubResource("Mat_SnowWarm")
 
-[node name="Hurdle5" type="CSGBox3D" parent="MapGeometry"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8.0, -53)
+[node name="Hurdle5" type="CSGBox3D" parent="MapGeometry" unique_id=2107703042]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8, -53)
 size = Vector3(4, 2.5, 0.6)
 material = SubResource("Mat_Stone")
 
-[node name="Hurdle6" type="CSGBox3D" parent="MapGeometry"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8.0, -58)
+[node name="Hurdle6" type="CSGBox3D" parent="MapGeometry" unique_id=1291741018]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8, -58)
 size = Vector3(4, 2.5, 0.6)
 material = SubResource("Mat_Stone")
 
-; ── SECTION 5: Zigzag gauntlet ───────────────────────────────────────────
-[node name="GauntletPlatform1" type="CSGBox3D" parent="MapGeometry"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.0, 6.5, -68)
+[node name="GauntletPlatform1" type="CSGBox3D" parent="MapGeometry" unique_id=1240364494]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 6.5, -68)
 size = Vector3(5, 1, 12)
 material = SubResource("Mat_SnowWarm")
 
-[node name="Hurdle7" type="CSGBox3D" parent="MapGeometry"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.0, 8.0, -67)
+[node name="Hurdle7" type="CSGBox3D" parent="MapGeometry" unique_id=1720156924]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 8, -67)
 size = Vector3(5, 1.8, 0.6)
 material = SubResource("Mat_Stone")
 
-[node name="Hurdle8" type="CSGBox3D" parent="MapGeometry"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.0, 8.0, -72)
+[node name="Hurdle8" type="CSGBox3D" parent="MapGeometry" unique_id=757496631]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 8, -72)
 size = Vector3(5, 2.2, 0.6)
 material = SubResource("Mat_Stone")
 
-[node name="GauntletPlatform2" type="CSGBox3D" parent="MapGeometry"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.0, 7.0, -82)
+[node name="GauntletPlatform2" type="CSGBox3D" parent="MapGeometry" unique_id=157499720]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 7, -82)
 size = Vector3(5, 1, 12)
 material = SubResource("Mat_Stone")
 
-[node name="Hurdle9" type="CSGBox3D" parent="MapGeometry"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.0, 8.5, -80)
-size = Vector3(5, 2.0, 0.6)
+[node name="Hurdle9" type="CSGBox3D" parent="MapGeometry" unique_id=392424382]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 8.5, -80)
+size = Vector3(5, 2, 0.6)
 material = SubResource("Mat_Stone")
 
-[node name="Hurdle10" type="CSGBox3D" parent="MapGeometry"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.0, 8.5, -86)
+[node name="Hurdle10" type="CSGBox3D" parent="MapGeometry" unique_id=2058830512]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 8.5, -86)
 size = Vector3(5, 2.5, 0.6)
 material = SubResource("Mat_Stone")
 
-; ── SECTION 6: Finish arch & platform ────────────────────────────────────
 [node name="FinishPlatform" type="CSGBox3D" parent="MapGeometry" unique_id=1527679877]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8.5, -100)
 size = Vector3(16, 1, 10)
@@ -253,18 +239,16 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 14.2, -100)
 size = Vector3(8, 1.2, 1.4)
 material = SubResource("Mat_ArchRed")
 
-; ── SIDE WALLS ────────────────────────────────────────────────────────────
 [node name="WallLeft" type="CSGBox3D" parent="MapGeometry" unique_id=543267489]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.5, 3.0, -50)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.5, 3, -50)
 size = Vector3(0.5, 20, 106)
 material = SubResource("Mat_Stone")
 
 [node name="WallRight" type="CSGBox3D" parent="MapGeometry" unique_id=1930661300]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.5, 3.0, -50)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.5, 3, -50)
 size = Vector3(0.5, 20, 106)
 material = SubResource("Mat_Stone")
 
-; ── PRAYER FLAGS ──────────────────────────────────────────────────────────
 [node name="PrayerFlags" type="Node3D" parent="." unique_id=1416100613]
 
 [node name="FlagRope" type="CSGBox3D" parent="PrayerFlags" unique_id=129106687]
@@ -288,7 +272,7 @@ size = Vector3(0.05, 2, 1.5)
 material = SubResource("Mat_FlagRed")
 
 [node name="Flag_Green" type="CSGBox3D" parent="PrayerFlags" unique_id=2103100243]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.8, 5.0, -34)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.8, 5, -34)
 size = Vector3(0.05, 2, 1.5)
 material = SubResource("Mat_FlagGreen")
 
@@ -298,11 +282,10 @@ size = Vector3(0.05, 2, 1.5)
 material = SubResource("Mat_FlagYellow")
 
 [node name="Flag_Blue2" type="CSGBox3D" parent="PrayerFlags" unique_id=31241043]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.8, 6.0, -54)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.8, 6, -54)
 size = Vector3(0.05, 2, 1.5)
 material = SubResource("Mat_FlagBlue")
 
-; ── MOMO COINS ────────────────────────────────────────────────────────────
 [node name="MomoCoin" parent="." unique_id=843205842 instance=ExtResource("2_momo")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.5, -23)
 
@@ -312,5 +295,5 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.5, 6.5, -36)
 [node name="MomoCoin3" parent="." unique_id=1662935665 instance=ExtResource("2_momo")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.5, 6.5, -36)
 
-[node name="MomoCoin4" parent="." instance=ExtResource("2_momo")]
+[node name="MomoCoin4" parent="." unique_id=1637153793 instance=ExtResource("2_momo")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8.5, -57)

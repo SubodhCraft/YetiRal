@@ -17,6 +17,8 @@ func _on_body_entered(body: Node3D) -> void:
 		else:
 			if GameManager:
 				GameManager.add_momo(1)
+			if AudioManager and AudioManager.has_method("play_momo_collect"):
+				AudioManager.play_momo_collect()
 			queue_free()
 
 @rpc("any_peer", "call_local", "reliable")
@@ -26,4 +28,6 @@ func collect_coin(by_peer_id: int) -> void:
 			GameManager.add_momo_to_peer(by_peer_id, 1)
 		else:
 			GameManager.add_momo(1)
+	if AudioManager and AudioManager.has_method("play_momo_collect"):
+		AudioManager.play_momo_collect()
 	queue_free()

@@ -1,0 +1,31 @@
+[gd_scene load_steps=5 format=3 uid="uid://river_raft_scene"]
+
+[ext_resource type="Script" path="res://scripts/rounds/RaftMover.gd" id="1_mover"]
+[ext_resource type="Script" path="res://scripts/rounds/river_raft.gd" id="2_wobble"]
+
+[sub_resource type="BoxShape3D" id="Shape_Raft"]
+size = Vector3(6.0, 1.0, 8.0)
+
+[sub_resource type="StandardMaterial3D" id="Mat_Raft"]
+albedo_color = Color(0.9, 0.8, 0.1, 1.0)
+roughness = 0.6
+
+[node name="RiverRaftPath" type="Path3D"]
+
+[node name="PathFollow3D" type="PathFollow3D" parent="."]
+script = ExtResource("1_mover")
+raft_speed = 8.0
+is_active = true
+
+[node name="RaftBody" type="AnimatableBody3D" parent="PathFollow3D"]
+sync_to_physics = true
+script = ExtResource("2_wobble")
+bob_intensity = 0.5
+wave_speed = 3.0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="PathFollow3D/RaftBody"]
+shape = SubResource("Shape_Raft")
+
+[node name="CSGBox3D" type="CSGBox3D" parent="PathFollow3D/RaftBody"]
+size = Vector3(6.0, 1.0, 8.0)
+material = SubResource("Mat_Raft")

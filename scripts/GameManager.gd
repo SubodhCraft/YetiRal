@@ -15,7 +15,8 @@ const ROUNDS: Array[String] = [
 	"res://scenes/gameplay/rounds/Round4_KathmanduDash.tscn",
 	"res://scenes/gameplay/rounds/Round5_EverestSummit.tscn",
 	"res://scenes/gameplay/rounds/Round6_MemoryTiles.tscn",
-	"res://scenes/gameplay/rounds/Round7_LavaDoors.tscn"
+	"res://scenes/gameplay/rounds/Round7_LavaDoors.tscn",
+	"res://scenes/gameplay/rounds/Round8_YetiSnowfield.tscn"
 ]
 
 const VICTORY_SCENE: String = "res://scenes/ui/VictoryScreen.tscn"
@@ -32,6 +33,16 @@ var player_momos: Dictionary = {}         # peer_id -> momos count
 var round_finishes: Array = []            # peer_ids in finish order
 var player_finished_status: Dictionary = {} # peer_id -> bool
 
+# ─── FACT TRACKING ────────────────────────────────────────────────────────────
+var shown_facts: Array[int] = []
+
+func mark_fact_shown(index: int) -> void:
+	if not shown_facts.has(index):
+		shown_facts.append(index)
+
+func has_fact_been_shown(index: int) -> bool:
+	return shown_facts.has(index)
+
 # ─────────────────────────────────────────────────────────────────────────────
 # SINGLEPLAYER FLOW
 # Rounds always go in FIXED order: 1 → 2 → 3 → 4 → 5
@@ -42,6 +53,7 @@ func start_game() -> void:
 	lives = 3
 	momos = 0
 	current_round_index = 0
+	shown_facts.clear()
 	is_transitioning = false
 	stats_changed.emit()
 	_load_sp_round()
@@ -75,6 +87,30 @@ func lose_life() -> void:
 	lives -= 1
 	stats_changed.emit()
 	if lives <= 0:
+		if AudioManager and AudioManager.has_method("play_game_over_sfx"):
+			AudioManager.play_game_over_sfx()
+		show_game_over()
+	else:
+		if AudioManager and AudioManager.has_method("play_death_sfx"):
+			AudioManager.play_death_sfx()
+		
+		# Wait 3 seconds for the Mario Death sound to finish playing
+		await get_tree().create_timer(3.0).timeout
+		
+		_load_sp_round()  # Retry current round
+	get_tree().create_timer(0.5).timeout.connect(func():
+		is_transitioning = false
+	)
+
+func lose_life_instant() -> void:
+	if is_transitioning:
+		return
+	is_transitioning = true
+	lives -= 1
+	stats_changed.emit()
+	if lives <= 0:
+		if AudioManager and AudioManager.has_method("play_game_over_sfx"):
+			AudioManager.play_game_over_sfx()
 		show_game_over()
 	else:
 		_load_sp_round()  # Retry current round
@@ -85,13 +121,16 @@ func lose_life() -> void:
 func add_momo(amount: int = 1) -> void:
 	momos += amount
 	if SessionManager.is_logged_in():
+		SessionManager.add_user_momos(SessionManager.get_current_user(), amount)
 		SessionManager.add_xp(SessionManager.get_current_user(), amount * 5)
 	stats_changed.emit()
 
 func show_game_over() -> void:
+	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	get_tree().call_deferred("change_scene_to_file", GAME_OVER_SCENE)
 
 func show_victory() -> void:
+	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	get_tree().call_deferred("change_scene_to_file", VICTORY_SCENE)
 
 func return_to_dashboard() -> void:
@@ -106,6 +145,7 @@ func return_to_dashboard() -> void:
 func start_multiplayer_game() -> void:
 	is_multiplayer = true
 	current_round_index = 0
+	shown_facts.clear()
 	player_scores.clear()
 	player_momos.clear()
 
@@ -134,6 +174,7 @@ func add_momo_to_peer(peer_id: int, amount: int) -> void:
 	player_momos[peer_id] = player_momos.get(peer_id, 0) + amount
 	player_scores[peer_id] = player_scores.get(peer_id, 0) + amount
 	if peer_id == multiplayer.get_unique_id() and SessionManager.is_logged_in():
+		SessionManager.add_user_momos(SessionManager.get_current_user(), amount)
 		SessionManager.add_xp(SessionManager.get_current_user(), amount * 5)
 	stats_changed.emit()
 

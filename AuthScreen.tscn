@@ -1,10 +1,6 @@
-[gd_scene load_steps=12 format=3 uid="uid://cb5n2g"]
+[gd_scene format=3 uid="uid://cb5n2g"]
 
-[ext_resource type="Script" path="res://scripts/AuthScreen.gd" id="1_auth"]
-
-; ══════════════════════════════════════════════════════════════════════════════
-; THEME RESOURCES (Yeti Run Mockup)
-; ══════════════════════════════════════════════════════════════════════════════
+[ext_resource type="Script" uid="uid://qfnilu2lgnnx" path="res://scripts/AuthScreen.gd" id="1_auth"]
 
 [sub_resource type="StyleBoxFlat" id="SB_glass"]
 bg_color = Color(0.11, 0.14, 0.18, 0.95)
@@ -17,52 +13,59 @@ corner_radius_top_left = 12
 corner_radius_top_right = 12
 corner_radius_bottom_right = 12
 corner_radius_bottom_left = 12
-shadow_color = Color(0.0, 0.0, 0.0, 0.3)
-shadow_size = 30
-shadow_offset = Vector2(0, 10)
 expand_margin_left = 8.0
 expand_margin_top = 8.0
 expand_margin_right = 8.0
 expand_margin_bottom = 8.0
+shadow_color = Color(0, 0, 0, 0.3)
+shadow_size = 30
+shadow_offset = Vector2(0, 10)
 
 [sub_resource type="StyleBoxFlat" id="SB_field_n"]
-bg_color = Color(1.0, 1.0, 1.0, 1.0)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
 content_margin_left = 16.0
 content_margin_top = 12.0
 content_margin_right = 16.0
 content_margin_bottom = 12.0
+bg_color = Color(1, 1, 1, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
 
 [sub_resource type="StyleBoxFlat" id="SB_field_f"]
-bg_color = Color(1.0, 1.0, 1.0, 1.0)
+content_margin_left = 16.0
+content_margin_top = 12.0
+content_margin_right = 16.0
+content_margin_bottom = 12.0
+bg_color = Color(1, 1, 1, 1)
 border_width_left = 2
 border_width_top = 2
 border_width_right = 2
 border_width_bottom = 2
-border_color = Color(0.25, 0.65, 0.65, 1.0)
+border_color = Color(0.25, 0.65, 0.65, 1)
 corner_radius_top_left = 6
 corner_radius_top_right = 6
 corner_radius_bottom_right = 6
 corner_radius_bottom_left = 6
-content_margin_left = 16.0
-content_margin_top = 12.0
-content_margin_right = 16.0
-content_margin_bottom = 12.0
 shadow_color = Color(0.25, 0.65, 0.65, 0.3)
 shadow_size = 6
 
 [sub_resource type="StyleBoxFlat" id="SB_btn_primary_n"]
-bg_color = Color(0.32, 0.66, 0.66, 1.0)
+bg_color = Color(0.32, 0.66, 0.66, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="SB_btn_primary_p"]
+bg_color = Color(0.2, 0.5, 0.5, 1)
 corner_radius_top_left = 6
 corner_radius_top_right = 6
 corner_radius_bottom_right = 6
 corner_radius_bottom_left = 6
 
 [sub_resource type="StyleBoxFlat" id="SB_btn_primary_h"]
-bg_color = Color(0.40, 0.75, 0.75, 1.0)
+bg_color = Color(0.4, 0.75, 0.75, 1)
 corner_radius_top_left = 6
 corner_radius_top_right = 6
 corner_radius_bottom_right = 6
@@ -70,36 +73,24 @@ corner_radius_bottom_left = 6
 shadow_color = Color(0.32, 0.66, 0.66, 0.4)
 shadow_size = 12
 
-[sub_resource type="StyleBoxFlat" id="SB_btn_primary_p"]
-bg_color = Color(0.20, 0.50, 0.50, 1.0)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
+[sub_resource type="StyleBoxLine" id="SB_line"]
+color = Color(0.3, 0.35, 0.4, 0.5)
 
 [sub_resource type="StyleBoxFlat" id="SB_btn_social_n"]
-bg_color = Color(0.18, 0.20, 0.23, 1.0)
+bg_color = Color(0.18, 0.2, 0.23, 1)
 corner_radius_top_left = 6
 corner_radius_top_right = 6
 corner_radius_bottom_right = 6
 corner_radius_bottom_left = 6
 
 [sub_resource type="StyleBoxFlat" id="SB_btn_social_h"]
-bg_color = Color(0.25, 0.28, 0.32, 1.0)
+bg_color = Color(0.25, 0.28, 0.32, 1)
 corner_radius_top_left = 6
 corner_radius_top_right = 6
 corner_radius_bottom_right = 6
 corner_radius_bottom_left = 6
 
-[sub_resource type="StyleBoxLine" id="SB_line"]
-color = Color(0.30, 0.35, 0.40, 0.5)
-thickness = 1
-
-; ══════════════════════════════════════════════════════════════════════════════
-; SCENE TREE
-; ══════════════════════════════════════════════════════════════════════════════
-
-[node name="AuthScreen" type="Control"]
+[node name="AuthScreen" type="Control" unique_id=737517578]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -108,8 +99,7 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_auth")
 
-; ── Background ────────────────────────────────────────────────────────
-[node name="BgLayer" type="TextureRect" parent="."]
+[node name="BgLayer" type="TextureRect" parent="." unique_id=1552159248]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -119,7 +109,7 @@ grow_vertical = 2
 expand_mode = 1
 stretch_mode = 6
 
-[node name="Overlay" type="ColorRect" parent="."]
+[node name="Overlay" type="ColorRect" parent="." unique_id=678437476]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -128,8 +118,7 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.04, 0.06, 0.1, 0.75)
 
-; ── Center Structure ──────────────────────────────────────────────────
-[node name="CenterContainer" type="CenterContainer" parent="."]
+[node name="CenterContainer" type="CenterContainer" parent="." unique_id=430818425]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -137,414 +126,392 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="MainVBox" type="VBoxContainer" parent="CenterContainer"]
+[node name="MainVBox" type="VBoxContainer" parent="CenterContainer" unique_id=2109614911]
 layout_mode = 2
 theme_override_constants/separation = 24
 
-; ── Logo Header ───────────────────────────────────────────────────────
-[node name="LogoVBox" type="VBoxContainer" parent="CenterContainer/MainVBox"]
+[node name="LogoVBox" type="VBoxContainer" parent="CenterContainer/MainVBox" unique_id=2052419266]
 layout_mode = 2
-alignment = 1
 theme_override_constants/separation = 4
+alignment = 1
 
-[node name="LogoLabel" type="Label" parent="CenterContainer/MainVBox/LogoVBox"]
+[node name="LogoLabel" type="Label" parent="CenterContainer/MainVBox/LogoVBox" unique_id=425515164]
 layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 32
 text = "🏔 YetiRal"
 horizontal_alignment = 1
-theme_override_font_sizes/font_size = 32
-theme_override_colors/font_color = Color(1.0, 1.0, 1.0, 1.0)
 
-[node name="LogoUnderline" type="ColorRect" parent="CenterContainer/MainVBox/LogoVBox"]
-layout_mode = 2
+[node name="LogoUnderline" type="ColorRect" parent="CenterContainer/MainVBox/LogoVBox" unique_id=1159810691]
 custom_minimum_size = Vector2(40, 3)
-size_flags_horizontal = 4
-color = Color(0.32, 0.66, 0.66, 1.0)
-
-; ── Main Glass Panel ──────────────────────────────────────────────────
-[node name="GlassPanel" type="PanelContainer" parent="CenterContainer/MainVBox"]
-unique_name_in_owner = true
 layout_mode = 2
+size_flags_horizontal = 4
+color = Color(0.32, 0.66, 0.66, 1)
+
+[node name="GlassPanel" type="PanelContainer" parent="CenterContainer/MainVBox" unique_id=2108341765]
+unique_name_in_owner = true
 custom_minimum_size = Vector2(440, 0)
+layout_mode = 2
 theme_override_styles/panel = SubResource("SB_glass")
 
-[node name="PanelMargin" type="MarginContainer" parent="CenterContainer/MainVBox/GlassPanel"]
+[node name="PanelMargin" type="MarginContainer" parent="CenterContainer/MainVBox/GlassPanel" unique_id=2060085472]
 layout_mode = 2
 theme_override_constants/margin_left = 32
 theme_override_constants/margin_top = 36
 theme_override_constants/margin_right = 32
 theme_override_constants/margin_bottom = 32
 
-[node name="FormsBox" type="VBoxContainer" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin"]
+[node name="FormsBox" type="VBoxContainer" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin" unique_id=680131661]
 layout_mode = 2
 theme_override_constants/separation = 0
 
-; ══════════════════════════════════════════════════════════════════════════════
-; LOGIN FORM
-; ══════════════════════════════════════════════════════════════════════════════
-[node name="LoginForm" type="VBoxContainer" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox"]
+[node name="LoginForm" type="VBoxContainer" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox" unique_id=157868124]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/separation = 16
 
-[node name="HeaderVBox" type="VBoxContainer" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/LoginForm"]
+[node name="HeaderVBox" type="VBoxContainer" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/LoginForm" unique_id=1667655924]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="Title" type="Label" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/LoginForm/HeaderVBox"]
+[node name="Title" type="Label" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/LoginForm/HeaderVBox" unique_id=1217582892]
 layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 22
 text = "Begin Your Expedition"
 horizontal_alignment = 1
-theme_override_font_sizes/font_size = 22
-theme_override_colors/font_color = Color(1.0, 1.0, 1.0, 1.0)
 
-[node name="Subtitle" type="Label" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/LoginForm/HeaderVBox"]
+[node name="Subtitle" type="Label" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/LoginForm/HeaderVBox" unique_id=393401987]
 layout_mode = 2
+theme_override_colors/font_color = Color(0.65, 0.7, 0.75, 1)
+theme_override_font_sizes/font_size = 13
 text = "Log in to save your progress and climb
 the global ranks."
 horizontal_alignment = 1
-theme_override_font_sizes/font_size = 13
-theme_override_colors/font_color = Color(0.65, 0.70, 0.75, 1.0)
 autowrap_mode = 3
 
-[node name="Spacer1" type="Control" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/LoginForm"]
-layout_mode = 2
+[node name="Spacer1" type="Control" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/LoginForm" unique_id=1403051587]
 custom_minimum_size = Vector2(0, 8)
-
-; -- Email
-[node name="EmailLabel" type="Label" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/LoginForm"]
 layout_mode = 2
-text = "Email Address"
+
+[node name="EmailLabel" type="Label" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/LoginForm" unique_id=1878044091]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.85, 0.9, 1)
 theme_override_font_sizes/font_size = 11
-theme_override_colors/font_color = Color(0.8, 0.85, 0.9, 1.0)
+text = "Email Address"
 
-[node name="LoginUsernameField" type="LineEdit" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/LoginForm"]
+[node name="LoginUsernameField" type="LineEdit" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/LoginForm" unique_id=1216557855]
 unique_name_in_owner = true
-layout_mode = 2
 custom_minimum_size = Vector2(0, 48)
-placeholder_text = "✉ explorer@himalayas.com"
+layout_mode = 2
+theme_override_colors/font_color = Color(0.1, 0.1, 0.1, 1)
+theme_override_colors/font_placeholder_color = Color(0.8, 0.8, 0.8, 1)
+theme_override_colors/caret_color = Color(0.2, 0.2, 0.2, 1)
+theme_override_colors/selection_color = Color(0.8, 0.9, 1, 1)
 theme_override_styles/normal = SubResource("SB_field_n")
 theme_override_styles/focus = SubResource("SB_field_f")
-theme_override_colors/font_color = Color(0.1, 0.1, 0.1, 1.0)
-theme_override_colors/font_placeholder_color = Color(0.8, 0.8, 0.8, 1.0)
-theme_override_colors/caret_color = Color(0.2, 0.2, 0.2, 1.0)
-theme_override_colors/selection_color = Color(0.8, 0.9, 1.0, 1.0)
+placeholder_text = "✉ explorer@himalayas.com"
 
-; -- Password
-[node name="PasswordHBox" type="HBoxContainer" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/LoginForm"]
+[node name="PasswordHBox" type="HBoxContainer" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/LoginForm" unique_id=70366604]
 layout_mode = 2
 
-[node name="PassLabel" type="Label" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/LoginForm/PasswordHBox"]
+[node name="PassLabel" type="Label" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/LoginForm/PasswordHBox" unique_id=696215577]
 layout_mode = 2
 size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.8, 0.85, 0.9, 1)
+theme_override_font_sizes/font_size = 11
 text = "Password"
-theme_override_font_sizes/font_size = 11
-theme_override_colors/font_color = Color(0.8, 0.85, 0.9, 1.0)
 
-[node name="ForgotLabel" type="Label" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/LoginForm/PasswordHBox"]
+[node name="ForgotLabel" type="Label" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/LoginForm/PasswordHBox" unique_id=227331238]
 layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.75, 0.75, 1)
+theme_override_font_sizes/font_size = 11
 text = "Forgot Password?"
-theme_override_font_sizes/font_size = 11
-theme_override_colors/font_color = Color(0.40, 0.75, 0.75, 1.0)
 
-[node name="LoginPasswordField" type="LineEdit" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/LoginForm"]
+[node name="LoginPasswordField" type="LineEdit" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/LoginForm" unique_id=1538157910]
 unique_name_in_owner = true
-layout_mode = 2
 custom_minimum_size = Vector2(0, 48)
-placeholder_text = "🔒 •••••••••"
-secret = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.1, 0.1, 0.1, 1)
+theme_override_colors/font_placeholder_color = Color(0.8, 0.8, 0.8, 1)
+theme_override_colors/caret_color = Color(0.2, 0.2, 0.2, 1)
+theme_override_colors/selection_color = Color(0.8, 0.9, 1, 1)
 theme_override_styles/normal = SubResource("SB_field_n")
 theme_override_styles/focus = SubResource("SB_field_f")
-theme_override_colors/font_color = Color(0.1, 0.1, 0.1, 1.0)
-theme_override_colors/font_placeholder_color = Color(0.8, 0.8, 0.8, 1.0)
-theme_override_colors/caret_color = Color(0.2, 0.2, 0.2, 1.0)
-theme_override_colors/selection_color = Color(0.8, 0.9, 1.0, 1.0)
+placeholder_text = "🔒 •••••••••"
+secret = true
 
-[node name="Spacer2" type="Control" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/LoginForm"]
-layout_mode = 2
+[node name="Spacer2" type="Control" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/LoginForm" unique_id=474038735]
 custom_minimum_size = Vector2(0, 4)
-
-; -- Sign In Button
-[node name="LoginButton" type="Button" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/LoginForm"]
-unique_name_in_owner = true
 layout_mode = 2
+
+[node name="LoginButton" type="Button" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/LoginForm" unique_id=1454628868]
+unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 48)
-text = "Sign In  →"
-theme_override_styles/normal = SubResource("SB_btn_primary_n")
-theme_override_styles/hover = SubResource("SB_btn_primary_h")
-theme_override_styles/pressed = SubResource("SB_btn_primary_p")
-theme_override_styles/focus = SubResource("SB_btn_primary_n")
-theme_override_colors/font_color = Color(0.05, 0.15, 0.15, 1.0)
-theme_override_colors/font_hover_color = Color(0.0, 0.0, 0.0, 1.0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.05, 0.15, 0.15, 1)
+theme_override_colors/font_hover_color = Color(0, 0, 0, 1)
 theme_override_font_sizes/font_size = 15
+theme_override_styles/normal = SubResource("SB_btn_primary_n")
+theme_override_styles/pressed = SubResource("SB_btn_primary_p")
+theme_override_styles/hover = SubResource("SB_btn_primary_h")
+theme_override_styles/focus = SubResource("SB_btn_primary_n")
+text = "Sign In  →"
 
-[node name="LoginMessageLabel" type="Label" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/LoginForm"]
+[node name="LoginMessageLabel" type="Label" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/LoginForm" unique_id=9379361]
 unique_name_in_owner = true
 layout_mode = 2
-horizontal_alignment = 1
 theme_override_font_sizes/font_size = 12
+horizontal_alignment = 1
 
-; -- Divider
-[node name="DividerHBox" type="HBoxContainer" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/LoginForm"]
+[node name="DividerHBox" type="HBoxContainer" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/LoginForm" unique_id=2099029470]
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="HSeparator1" type="HSeparator" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/LoginForm/DividerHBox"]
+[node name="HSeparator1" type="HSeparator" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/LoginForm/DividerHBox" unique_id=957072457]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_styles/separator = SubResource("SB_line")
 
-[node name="OrLabel" type="Label" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/LoginForm/DividerHBox"]
+[node name="OrLabel" type="Label" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/LoginForm/DividerHBox" unique_id=339034421]
 layout_mode = 2
-text = "OR CONTINUE WITH"
+theme_override_colors/font_color = Color(0.5, 0.55, 0.6, 1)
 theme_override_font_sizes/font_size = 10
-theme_override_colors/font_color = Color(0.5, 0.55, 0.6, 1.0)
+text = "OR CONTINUE WITH"
 
-[node name="HSeparator2" type="HSeparator" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/LoginForm/DividerHBox"]
+[node name="HSeparator2" type="HSeparator" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/LoginForm/DividerHBox" unique_id=1122006764]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_styles/separator = SubResource("SB_line")
 
-; -- Social
-[node name="SocialHBox" type="HBoxContainer" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/LoginForm"]
+[node name="SocialHBox" type="HBoxContainer" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/LoginForm" unique_id=1693890321]
 layout_mode = 2
 theme_override_constants/separation = 16
 
-[node name="GoogleBtn" type="Button" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/LoginForm/SocialHBox"]
+[node name="GoogleBtn" type="Button" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/LoginForm/SocialHBox" unique_id=1294885097]
+custom_minimum_size = Vector2(0, 44)
 layout_mode = 2
 size_flags_horizontal = 3
-custom_minimum_size = Vector2(0, 44)
+theme_override_font_sizes/font_size = 13
+theme_override_styles/normal = SubResource("SB_btn_social_n")
+theme_override_styles/pressed = SubResource("SB_btn_social_n")
+theme_override_styles/hover = SubResource("SB_btn_social_h")
+theme_override_styles/focus = SubResource("SB_btn_social_n")
 text = "G  Google"
-theme_override_styles/normal = SubResource("SB_btn_social_n")
-theme_override_styles/hover = SubResource("SB_btn_social_h")
-theme_override_styles/pressed = SubResource("SB_btn_social_n")
-theme_override_styles/focus = SubResource("SB_btn_social_n")
-theme_override_font_sizes/font_size = 13
 
-[node name="DiscordBtn" type="Button" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/LoginForm/SocialHBox"]
+[node name="DiscordBtn" type="Button" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/LoginForm/SocialHBox" unique_id=82491832]
+custom_minimum_size = Vector2(0, 44)
 layout_mode = 2
 size_flags_horizontal = 3
-custom_minimum_size = Vector2(0, 44)
-text = "D  Discord"
-theme_override_styles/normal = SubResource("SB_btn_social_n")
-theme_override_styles/hover = SubResource("SB_btn_social_h")
-theme_override_styles/pressed = SubResource("SB_btn_social_n")
-theme_override_styles/focus = SubResource("SB_btn_social_n")
 theme_override_font_sizes/font_size = 13
+theme_override_styles/normal = SubResource("SB_btn_social_n")
+theme_override_styles/pressed = SubResource("SB_btn_social_n")
+theme_override_styles/hover = SubResource("SB_btn_social_h")
+theme_override_styles/focus = SubResource("SB_btn_social_n")
+text = "D  Discord"
 
-[node name="Spacer3" type="Control" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/LoginForm"]
-layout_mode = 2
+[node name="Spacer3" type="Control" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/LoginForm" unique_id=1247911203]
 custom_minimum_size = Vector2(0, 8)
+layout_mode = 2
 
-; -- Footer Text
-[node name="FooterHBox" type="HBoxContainer" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/LoginForm"]
+[node name="FooterHBox" type="HBoxContainer" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/LoginForm" unique_id=1311824767]
 layout_mode = 2
 alignment = 1
 
-[node name="Prefix" type="Label" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/LoginForm/FooterHBox"]
+[node name="Prefix" type="Label" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/LoginForm/FooterHBox" unique_id=170512568]
 layout_mode = 2
-text = "New to the peaks?"
+theme_override_colors/font_color = Color(0.7, 0.75, 0.8, 1)
 theme_override_font_sizes/font_size = 12
-theme_override_colors/font_color = Color(0.7, 0.75, 0.8, 1.0)
+text = "New to the peaks?"
 
-[node name="GoToSignupButton" type="Button" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/LoginForm/FooterHBox"]
+[node name="GoToSignupButton" type="Button" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/LoginForm/FooterHBox" unique_id=1492819667]
 unique_name_in_owner = true
 layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.75, 0.75, 1)
+theme_override_colors/font_hover_color = Color(0.55, 0.9, 0.9, 1)
+theme_override_font_sizes/font_size = 12
 text = "Create an Account"
 flat = true
-theme_override_colors/font_color = Color(0.40, 0.75, 0.75, 1.0)
-theme_override_colors/font_hover_color = Color(0.55, 0.90, 0.90, 1.0)
-theme_override_font_sizes/font_size = 12
 
-; ══════════════════════════════════════════════════════════════════════════════
-; SIGNUP FORM
-; ══════════════════════════════════════════════════════════════════════════════
-[node name="SignupForm" type="VBoxContainer" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox"]
+[node name="SignupForm" type="VBoxContainer" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox" unique_id=1706173348]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
 theme_override_constants/separation = 16
 
-[node name="HeaderVBox" type="VBoxContainer" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/SignupForm"]
+[node name="HeaderVBox" type="VBoxContainer" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/SignupForm" unique_id=1771966552]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="Title" type="Label" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/SignupForm/HeaderVBox"]
+[node name="Title" type="Label" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/SignupForm/HeaderVBox" unique_id=480433813]
 layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 22
 text = "Join the Expedition"
 horizontal_alignment = 1
-theme_override_font_sizes/font_size = 22
-theme_override_colors/font_color = Color(1.0, 1.0, 1.0, 1.0)
 
-[node name="Subtitle" type="Label" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/SignupForm/HeaderVBox"]
+[node name="Subtitle" type="Label" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/SignupForm/HeaderVBox" unique_id=1871987531]
 layout_mode = 2
+theme_override_colors/font_color = Color(0.65, 0.7, 0.75, 1)
+theme_override_font_sizes/font_size = 13
 text = "Create an account to start your climb
 and conquer the global ranks."
 horizontal_alignment = 1
-theme_override_font_sizes/font_size = 13
-theme_override_colors/font_color = Color(0.65, 0.70, 0.75, 1.0)
 autowrap_mode = 3
 
-[node name="Spacer1" type="Control" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/SignupForm"]
-layout_mode = 2
+[node name="Spacer1" type="Control" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/SignupForm" unique_id=752234054]
 custom_minimum_size = Vector2(0, 4)
-
-; -- Email
-[node name="EmailLabel" type="Label" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/SignupForm"]
 layout_mode = 2
+
+[node name="EmailLabel" type="Label" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/SignupForm" unique_id=992959369]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.85, 0.9, 1)
+theme_override_font_sizes/font_size = 11
 text = "Email Address"
-theme_override_font_sizes/font_size = 11
-theme_override_colors/font_color = Color(0.8, 0.85, 0.9, 1.0)
 
-[node name="SignupUsernameField" type="LineEdit" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/SignupForm"]
+[node name="SignupUsernameField" type="LineEdit" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/SignupForm" unique_id=316983983]
 unique_name_in_owner = true
-layout_mode = 2
 custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.1, 0.1, 0.1, 1)
+theme_override_colors/font_placeholder_color = Color(0.8, 0.8, 0.8, 1)
+theme_override_colors/caret_color = Color(0.2, 0.2, 0.2, 1)
+theme_override_colors/selection_color = Color(0.8, 0.9, 1, 1)
+theme_override_styles/normal = SubResource("SB_field_n")
+theme_override_styles/focus = SubResource("SB_field_f")
 placeholder_text = "✉ explorer@himalayas.com"
-theme_override_styles/normal = SubResource("SB_field_n")
-theme_override_styles/focus = SubResource("SB_field_f")
-theme_override_colors/font_color = Color(0.1, 0.1, 0.1, 1.0)
-theme_override_colors/font_placeholder_color = Color(0.8, 0.8, 0.8, 1.0)
-theme_override_colors/caret_color = Color(0.2, 0.2, 0.2, 1.0)
-theme_override_colors/selection_color = Color(0.8, 0.9, 1.0, 1.0)
 
-; -- Password
-[node name="PassLabel" type="Label" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/SignupForm"]
+[node name="PassLabel" type="Label" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/SignupForm" unique_id=1687531371]
 layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.85, 0.9, 1)
+theme_override_font_sizes/font_size = 11
 text = "Password"
-theme_override_font_sizes/font_size = 11
-theme_override_colors/font_color = Color(0.8, 0.85, 0.9, 1.0)
 
-[node name="SignupPasswordField" type="LineEdit" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/SignupForm"]
+[node name="SignupPasswordField" type="LineEdit" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/SignupForm" unique_id=1844360774]
 unique_name_in_owner = true
-layout_mode = 2
 custom_minimum_size = Vector2(0, 48)
-placeholder_text = "🔒 •••••••••"
-secret = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.1, 0.1, 0.1, 1)
+theme_override_colors/font_placeholder_color = Color(0.8, 0.8, 0.8, 1)
+theme_override_colors/caret_color = Color(0.2, 0.2, 0.2, 1)
+theme_override_colors/selection_color = Color(0.8, 0.9, 1, 1)
 theme_override_styles/normal = SubResource("SB_field_n")
 theme_override_styles/focus = SubResource("SB_field_f")
-theme_override_colors/font_color = Color(0.1, 0.1, 0.1, 1.0)
-theme_override_colors/font_placeholder_color = Color(0.8, 0.8, 0.8, 1.0)
-theme_override_colors/caret_color = Color(0.2, 0.2, 0.2, 1.0)
-theme_override_colors/selection_color = Color(0.8, 0.9, 1.0, 1.0)
+placeholder_text = "🔒 •••••••••"
+secret = true
 
-; -- Confirm
-[node name="ConfirmLabel" type="Label" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/SignupForm"]
+[node name="ConfirmLabel" type="Label" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/SignupForm" unique_id=188369246]
 layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.85, 0.9, 1)
+theme_override_font_sizes/font_size = 11
 text = "Confirm Password"
-theme_override_font_sizes/font_size = 11
-theme_override_colors/font_color = Color(0.8, 0.85, 0.9, 1.0)
 
-[node name="SignupConfirmField" type="LineEdit" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/SignupForm"]
+[node name="SignupConfirmField" type="LineEdit" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/SignupForm" unique_id=116350712]
 unique_name_in_owner = true
-layout_mode = 2
 custom_minimum_size = Vector2(0, 48)
-placeholder_text = "🔒 •••••••••"
-secret = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.1, 0.1, 0.1, 1)
+theme_override_colors/font_placeholder_color = Color(0.8, 0.8, 0.8, 1)
+theme_override_colors/caret_color = Color(0.2, 0.2, 0.2, 1)
+theme_override_colors/selection_color = Color(0.8, 0.9, 1, 1)
 theme_override_styles/normal = SubResource("SB_field_n")
 theme_override_styles/focus = SubResource("SB_field_f")
-theme_override_colors/font_color = Color(0.1, 0.1, 0.1, 1.0)
-theme_override_colors/font_placeholder_color = Color(0.8, 0.8, 0.8, 1.0)
-theme_override_colors/caret_color = Color(0.2, 0.2, 0.2, 1.0)
-theme_override_colors/selection_color = Color(0.8, 0.9, 1.0, 1.0)
+placeholder_text = "🔒 •••••••••"
+secret = true
 
-[node name="Spacer2" type="Control" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/SignupForm"]
-layout_mode = 2
+[node name="Spacer2" type="Control" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/SignupForm" unique_id=1970513479]
 custom_minimum_size = Vector2(0, 4)
-
-; -- Sign Up Button
-[node name="SignupButton" type="Button" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/SignupForm"]
-unique_name_in_owner = true
 layout_mode = 2
+
+[node name="SignupButton" type="Button" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/SignupForm" unique_id=1980958947]
+unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 48)
-text = "Create Account  →"
-theme_override_styles/normal = SubResource("SB_btn_primary_n")
-theme_override_styles/hover = SubResource("SB_btn_primary_h")
-theme_override_styles/pressed = SubResource("SB_btn_primary_p")
-theme_override_styles/focus = SubResource("SB_btn_primary_n")
-theme_override_colors/font_color = Color(0.05, 0.15, 0.15, 1.0)
-theme_override_colors/font_hover_color = Color(0.0, 0.0, 0.0, 1.0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.05, 0.15, 0.15, 1)
+theme_override_colors/font_hover_color = Color(0, 0, 0, 1)
 theme_override_font_sizes/font_size = 15
+theme_override_styles/normal = SubResource("SB_btn_primary_n")
+theme_override_styles/pressed = SubResource("SB_btn_primary_p")
+theme_override_styles/hover = SubResource("SB_btn_primary_h")
+theme_override_styles/focus = SubResource("SB_btn_primary_n")
+text = "Create Account  →"
 
-[node name="SignupMessageLabel" type="Label" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/SignupForm"]
+[node name="SignupMessageLabel" type="Label" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/SignupForm" unique_id=1098029161]
 unique_name_in_owner = true
 layout_mode = 2
-horizontal_alignment = 1
 theme_override_font_sizes/font_size = 12
+horizontal_alignment = 1
 
-; -- Divider
-[node name="DividerHBox" type="HBoxContainer" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/SignupForm"]
+[node name="DividerHBox" type="HBoxContainer" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/SignupForm" unique_id=685221613]
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="HSeparator1" type="HSeparator" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/SignupForm/DividerHBox"]
+[node name="HSeparator1" type="HSeparator" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/SignupForm/DividerHBox" unique_id=1451254112]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_styles/separator = SubResource("SB_line")
 
-[node name="OrLabel" type="Label" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/SignupForm/DividerHBox"]
+[node name="OrLabel" type="Label" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/SignupForm/DividerHBox" unique_id=626667920]
 layout_mode = 2
-text = "OR CONTINUE WITH"
+theme_override_colors/font_color = Color(0.5, 0.55, 0.6, 1)
 theme_override_font_sizes/font_size = 10
-theme_override_colors/font_color = Color(0.5, 0.55, 0.6, 1.0)
+text = "OR CONTINUE WITH"
 
-[node name="HSeparator2" type="HSeparator" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/SignupForm/DividerHBox"]
+[node name="HSeparator2" type="HSeparator" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/SignupForm/DividerHBox" unique_id=591012775]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_styles/separator = SubResource("SB_line")
 
-; -- Social
-[node name="SocialHBox" type="HBoxContainer" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/SignupForm"]
+[node name="SocialHBox" type="HBoxContainer" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/SignupForm" unique_id=36193949]
 layout_mode = 2
 theme_override_constants/separation = 16
 
-[node name="GoogleBtn" type="Button" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/SignupForm/SocialHBox"]
+[node name="GoogleBtn" type="Button" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/SignupForm/SocialHBox" unique_id=1947176019]
+custom_minimum_size = Vector2(0, 44)
 layout_mode = 2
 size_flags_horizontal = 3
-custom_minimum_size = Vector2(0, 44)
+theme_override_font_sizes/font_size = 13
+theme_override_styles/normal = SubResource("SB_btn_social_n")
+theme_override_styles/pressed = SubResource("SB_btn_social_n")
+theme_override_styles/hover = SubResource("SB_btn_social_h")
+theme_override_styles/focus = SubResource("SB_btn_social_n")
 text = "G  Google"
-theme_override_styles/normal = SubResource("SB_btn_social_n")
-theme_override_styles/hover = SubResource("SB_btn_social_h")
-theme_override_styles/pressed = SubResource("SB_btn_social_n")
-theme_override_styles/focus = SubResource("SB_btn_social_n")
-theme_override_font_sizes/font_size = 13
 
-[node name="DiscordBtn" type="Button" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/SignupForm/SocialHBox"]
+[node name="DiscordBtn" type="Button" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/SignupForm/SocialHBox" unique_id=800128283]
+custom_minimum_size = Vector2(0, 44)
 layout_mode = 2
 size_flags_horizontal = 3
-custom_minimum_size = Vector2(0, 44)
-text = "D  Discord"
-theme_override_styles/normal = SubResource("SB_btn_social_n")
-theme_override_styles/hover = SubResource("SB_btn_social_h")
-theme_override_styles/pressed = SubResource("SB_btn_social_n")
-theme_override_styles/focus = SubResource("SB_btn_social_n")
 theme_override_font_sizes/font_size = 13
+theme_override_styles/normal = SubResource("SB_btn_social_n")
+theme_override_styles/pressed = SubResource("SB_btn_social_n")
+theme_override_styles/hover = SubResource("SB_btn_social_h")
+theme_override_styles/focus = SubResource("SB_btn_social_n")
+text = "D  Discord"
 
-[node name="Spacer3" type="Control" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/SignupForm"]
-layout_mode = 2
+[node name="Spacer3" type="Control" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/SignupForm" unique_id=64887131]
 custom_minimum_size = Vector2(0, 8)
+layout_mode = 2
 
-; -- Footer Text
-[node name="FooterHBox" type="HBoxContainer" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/SignupForm"]
+[node name="FooterHBox" type="HBoxContainer" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/SignupForm" unique_id=1144489902]
 layout_mode = 2
 alignment = 1
 
-[node name="Prefix" type="Label" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/SignupForm/FooterHBox"]
+[node name="Prefix" type="Label" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/SignupForm/FooterHBox" unique_id=1275448704]
 layout_mode = 2
-text = "Already climbed?"
+theme_override_colors/font_color = Color(0.7, 0.75, 0.8, 1)
 theme_override_font_sizes/font_size = 12
-theme_override_colors/font_color = Color(0.7, 0.75, 0.8, 1.0)
+text = "Already climbed?"
 
-[node name="GoToLoginButton" type="Button" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/SignupForm/FooterHBox"]
+[node name="GoToLoginButton" type="Button" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/SignupForm/FooterHBox" unique_id=12720537]
 unique_name_in_owner = true
 layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.75, 0.75, 1)
+theme_override_colors/font_hover_color = Color(0.55, 0.9, 0.9, 1)
+theme_override_font_sizes/font_size = 12
 text = "Sign In"
 flat = true
-theme_override_colors/font_color = Color(0.40, 0.75, 0.75, 1.0)
-theme_override_colors/font_hover_color = Color(0.55, 0.90, 0.90, 1.0)
-theme_override_font_sizes/font_size = 12
 
-; ── Server Status Overlay ─────────────────────────────────────────────
-[node name="StatusHBox" type="HBoxContainer" parent="."]
+[node name="StatusHBox" type="HBoxContainer" parent="." unique_id=1504289506]
 layout_mode = 1
 anchors_preset = 7
 anchor_left = 0.5
@@ -557,17 +524,17 @@ offset_right = 200.0
 offset_bottom = -20.0
 grow_horizontal = 2
 grow_vertical = 0
-alignment = 1
 theme_override_constants/separation = 24
+alignment = 1
 
-[node name="OnlineLabel" type="Label" parent="StatusHBox"]
+[node name="OnlineLabel" type="Label" parent="StatusHBox" unique_id=821974]
 layout_mode = 2
+theme_override_colors/font_color = Color(0.5, 0.55, 0.6, 1)
+theme_override_font_sizes/font_size = 10
 text = "🟢 BASE CAMP SERVERS: ONLINE"
-theme_override_font_sizes/font_size = 10
-theme_override_colors/font_color = Color(0.5, 0.55, 0.6, 1.0)
 
-[node name="WeatherLabel" type="Label" parent="StatusHBox"]
+[node name="WeatherLabel" type="Label" parent="StatusHBox" unique_id=1689042462]
 layout_mode = 2
-text = "❄ -42°C VISIBILITY: LOW"
+theme_override_colors/font_color = Color(0.5, 0.55, 0.6, 1)
 theme_override_font_sizes/font_size = 10
-theme_override_colors/font_color = Color(0.5, 0.55, 0.6, 1.0)
+text = "❄ -42°C VISIBILITY: LOW"

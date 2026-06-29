@@ -1,0 +1,22 @@
+[gd_scene load_steps=4 format=3 uid="uid://plank_scene_uid"]
+
+[ext_resource type="Script" path="res://scripts/rounds/Plank.gd" id="1_plank"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_plank"]
+size = Vector3(4.0, 0.4, 1.5)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_plank"]
+albedo_color = Color(0.35, 0.2, 0.1, 1)
+roughness = 0.85
+
+[node name="Plank" type="RigidBody3D"]
+mass = 80.0
+linear_damp = 1.5
+angular_damp = 3.0
+script = ExtResource("1_plank")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("BoxShape3D_plank")
+
+[node name="CSGBox3D" type="CSGBox3D" parent="."]
+size = Vector3(4.0, 0.4, 1.5)
+material = SubResource("StandardMaterial3D_plank")

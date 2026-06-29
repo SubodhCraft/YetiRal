@@ -64,6 +64,9 @@ emission_energy_multiplier = 0.3
 [sub_resource type="BoxShape3D" id="Shape_Kill"]
 size = Vector3(200, 8, 200)
 
+[sub_resource type="BoxShape3D" id="Shape_Sweeper"]
+size = Vector3(20, 1, 1)
+
 [sub_resource type="BoxShape3D" id="Shape_Finish"]
 size = Vector3(10, 5, 8)
 
@@ -154,7 +157,7 @@ material = SubResource("Mat_Abyss")
 [node name="Tiles" type="Node3D" parent="."]
 
 [node name="Tile1" type="AnimatableBody3D" parent="Tiles"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, -0.25, -4)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, -0.25, -6)
 collision_layer = 1
 collision_mask = 0
 
@@ -173,7 +176,7 @@ outline_size = 12
 visible = false
 
 [node name="Tile2" type="AnimatableBody3D" parent="Tiles"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.25, -4)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, -0.25, -6)
 collision_layer = 1
 collision_mask = 0
 
@@ -192,7 +195,7 @@ outline_size = 12
 visible = false
 
 [node name="Tile3" type="AnimatableBody3D" parent="Tiles"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, -0.25, -4)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, -0.25, -6)
 collision_layer = 1
 collision_mask = 0
 
@@ -211,7 +214,7 @@ outline_size = 12
 visible = false
 
 [node name="Tile4" type="AnimatableBody3D" parent="Tiles"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, -0.25, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, -0.25, -6)
 collision_layer = 1
 collision_mask = 0
 
@@ -230,7 +233,7 @@ outline_size = 12
 visible = false
 
 [node name="Tile5" type="AnimatableBody3D" parent="Tiles"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.25, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, -0.25, -2)
 collision_layer = 1
 collision_mask = 0
 
@@ -249,7 +252,7 @@ outline_size = 12
 visible = false
 
 [node name="Tile6" type="AnimatableBody3D" parent="Tiles"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, -0.25, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, -0.25, -2)
 collision_layer = 1
 collision_mask = 0
 
@@ -268,7 +271,7 @@ outline_size = 12
 visible = false
 
 [node name="Tile7" type="AnimatableBody3D" parent="Tiles"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, -0.25, 4)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, -0.25, -2)
 collision_layer = 1
 collision_mask = 0
 
@@ -287,7 +290,7 @@ outline_size = 12
 visible = false
 
 [node name="Tile8" type="AnimatableBody3D" parent="Tiles"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.25, 4)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, -0.25, -2)
 collision_layer = 1
 collision_mask = 0
 
@@ -306,7 +309,7 @@ outline_size = 12
 visible = false
 
 [node name="Tile9" type="AnimatableBody3D" parent="Tiles"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, -0.25, 4)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, -0.25, 2)
 collision_layer = 1
 collision_mask = 0
 
@@ -323,3 +326,191 @@ text = ""
 font_size = 64
 outline_size = 12
 visible = false
+
+[node name="Tile10" type="AnimatableBody3D" parent="Tiles"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, -0.25, 2)
+collision_layer = 1
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Tiles/Tile10"]
+shape = SubResource("Shape_Tile")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Tiles/Tile10"]
+mesh = SubResource("Mesh_Tile")
+surface_material_override/0 = SubResource("Mat_Tile")
+
+[node name="Label3D" type="Label3D" parent="Tiles/Tile10"]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0.26, 0)
+text = ""
+font_size = 64
+outline_size = 12
+visible = false
+
+[node name="Tile11" type="AnimatableBody3D" parent="Tiles"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, -0.25, 2)
+collision_layer = 1
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Tiles/Tile11"]
+shape = SubResource("Shape_Tile")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Tiles/Tile11"]
+mesh = SubResource("Mesh_Tile")
+surface_material_override/0 = SubResource("Mat_Tile")
+
+[node name="Label3D" type="Label3D" parent="Tiles/Tile11"]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0.26, 0)
+text = ""
+font_size = 64
+outline_size = 12
+visible = false
+
+[node name="Tile12" type="AnimatableBody3D" parent="Tiles"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, -0.25, 2)
+collision_layer = 1
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Tiles/Tile12"]
+shape = SubResource("Shape_Tile")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Tiles/Tile12"]
+mesh = SubResource("Mesh_Tile")
+surface_material_override/0 = SubResource("Mat_Tile")
+
+[node name="Label3D" type="Label3D" parent="Tiles/Tile12"]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0.26, 0)
+text = ""
+font_size = 64
+outline_size = 12
+visible = false
+
+[node name="Tile13" type="AnimatableBody3D" parent="Tiles"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, -0.25, 6)
+collision_layer = 1
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Tiles/Tile13"]
+shape = SubResource("Shape_Tile")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Tiles/Tile13"]
+mesh = SubResource("Mesh_Tile")
+surface_material_override/0 = SubResource("Mat_Tile")
+
+[node name="Label3D" type="Label3D" parent="Tiles/Tile13"]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0.26, 0)
+text = ""
+font_size = 64
+outline_size = 12
+visible = false
+
+[node name="Tile14" type="AnimatableBody3D" parent="Tiles"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, -0.25, 6)
+collision_layer = 1
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Tiles/Tile14"]
+shape = SubResource("Shape_Tile")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Tiles/Tile14"]
+mesh = SubResource("Mesh_Tile")
+surface_material_override/0 = SubResource("Mat_Tile")
+
+[node name="Label3D" type="Label3D" parent="Tiles/Tile14"]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0.26, 0)
+text = ""
+font_size = 64
+outline_size = 12
+visible = false
+
+[node name="Tile15" type="AnimatableBody3D" parent="Tiles"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, -0.25, 6)
+collision_layer = 1
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Tiles/Tile15"]
+shape = SubResource("Shape_Tile")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Tiles/Tile15"]
+mesh = SubResource("Mesh_Tile")
+surface_material_override/0 = SubResource("Mat_Tile")
+
+[node name="Label3D" type="Label3D" parent="Tiles/Tile15"]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0.26, 0)
+text = ""
+font_size = 64
+outline_size = 12
+visible = false
+
+[node name="Tile16" type="AnimatableBody3D" parent="Tiles"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, -0.25, 6)
+collision_layer = 1
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Tiles/Tile16"]
+shape = SubResource("Shape_Tile")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Tiles/Tile16"]
+mesh = SubResource("Mesh_Tile")
+surface_material_override/0 = SubResource("Mat_Tile")
+
+[node name="Label3D" type="Label3D" parent="Tiles/Tile16"]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0.26, 0)
+text = ""
+font_size = 64
+outline_size = 12
+visible = false
+
+[node name="TempleWalls" type="CSGCombiner3D" parent="MapGeometry"]
+use_collision = true
+
+[node name="WallLeft" type="CSGBox3D" parent="MapGeometry/TempleWalls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 4, 0)
+size = Vector3(2, 12, 32)
+material = SubResource("Mat_Platform")
+
+[node name="WallRight" type="CSGBox3D" parent="MapGeometry/TempleWalls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 4, 0)
+size = Vector3(2, 12, 32)
+material = SubResource("Mat_Platform")
+
+[node name="WallBack" type="CSGBox3D" parent="MapGeometry/TempleWalls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4, -16)
+size = Vector3(26, 12, 2)
+material = SubResource("Mat_Platform")
+
+[node name="Pillar1" type="CSGCylinder3D" parent="MapGeometry/TempleWalls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 4, -14)
+radius = 1.5
+height = 16.0
+material = SubResource("Mat_Gold")
+
+[node name="Pillar2" type="CSGCylinder3D" parent="MapGeometry/TempleWalls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 4, -14)
+radius = 1.5
+height = 16.0
+material = SubResource("Mat_Gold")
+
+[node name="Spikes" type="CSGBox3D" parent="MapGeometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -10, 0)
+size = Vector3(30, 1, 30)
+material = SubResource("Mat_Abyss")
+
+[node name="Sweeper" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+
+[node name="SweeperBase" type="CSGCylinder3D" parent="Sweeper"]
+radius = 1.0
+height = 2.0
+material = SubResource("Mat_Platform")
+
+[node name="SweeperArm" type="AnimatableBody3D" parent="Sweeper"]
+collision_layer = 1
+collision_mask = 2
+sync_to_physics = false
+
+[node name="MeshInstance3D" type="CSGBox3D" parent="Sweeper/SweeperArm"]
+size = Vector3(20, 1, 1)
+material = SubResource("Mat_Gold")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Sweeper/SweeperArm"]
+shape = SubResource("Shape_Sweeper")
