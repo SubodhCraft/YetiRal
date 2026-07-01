@@ -19,6 +19,7 @@ extends Control
 # ── Signup form ──
 @onready var signup_form:      VBoxContainer = %SignupForm
 @onready var signup_username:  LineEdit      = %SignupUsernameField
+@onready var signup_email:     LineEdit      = %SignupEmailField
 @onready var signup_password:  LineEdit      = %SignupPasswordField
 @onready var signup_confirm:   LineEdit      = %SignupConfirmField
 @onready var signup_btn:       Button        = %SignupButton
@@ -37,6 +38,7 @@ const MSG_COLOR_INFO:  Color = Color(0.65, 0.85, 1.00, 1.0)
 # ─────────────────────────────────────────────────────────────────────────────
 # STATE
 # ─────────────────────────────────────────────────────────────────────────────
+var default_field_style: StyleBoxFlat
 var _form_tween: Tween
 var remember_me_checkbox: CheckBox
 var forgot_pw_btn: Button
@@ -65,9 +67,13 @@ func _ready() -> void:
 	login_password.gui_input.connect(_on_login_password_key)
 	signup_confirm.gui_input.connect(_on_signup_confirm_key)
 
+	# Save default style to avoid black background bug
+	default_field_style = login_username.get_theme_stylebox("normal").duplicate() as StyleBoxFlat
+
 	# 1. Real-time validation connections
-	login_username.text_changed.connect(func(_new_text): _validate_username_field(login_username))
-	signup_username.text_changed.connect(func(_new_text): _validate_username_field(signup_username))
+	login_username.text_changed.connect(func(_new_text): _validate_field(login_username, false))
+	signup_username.text_changed.connect(func(_new_text): _validate_field(signup_username, false))
+	signup_email.text_changed.connect(func(_new_text): _validate_field(signup_email, true))
 	signup_password.text_changed.connect(_on_signup_password_changed)
 
 	# Setup password strength bar in Signup
@@ -81,14 +87,20 @@ func _ready() -> void:
 	var idx = signup_password.get_index()
 	signup_form.move_child(strength_bar, idx + 1)
 
+	# Fix black text bug by enforcing black font color on all inputs
+	var inputs = [login_username, login_password, signup_username, signup_email, signup_password, signup_confirm]
+	for inp in inputs:
+		if inp:
+			inp.add_theme_color_override("font_color", Color.BLACK)
+			inp.add_theme_color_override("font_focus_color", Color.BLACK)
+			inp.add_theme_color_override("font_uneditable_color", Color.BLACK)
+			inp.add_theme_color_override("font_placeholder_color", Color(0.3, 0.3, 0.3))
+
 	# 2. Loading spinner setup
 	_create_loading_spinner()
 
-	# 3. Remember Me setup
-	_setup_remember_me()
-
-	# 4. Forgot Password setup
-	_setup_forgot_password_btn()
+	# 3. Login Options row (Remember Me + Forgot PW)
+	_setup_login_options_row()
 
 	# 5. Password visibility toggle
 	_setup_password_visibility_toggle()
@@ -98,8 +110,8 @@ func _ready() -> void:
 
 func _input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and event.keycode == KEY_F1:
-		SessionManager.register_user("testuser", "testpassword")
-		var result = SessionManager.login_user("testuser", "testpassword")
+		await SessionManager.register_user("testuser", "testpassword")
+		var result = await SessionManager.login_user("testuser", "testpassword")
 		if result["success"]:
 			get_tree().change_scene_to_file(DASHBOARD_SCENE)
 
@@ -145,7 +157,7 @@ func _cross_fade(from_form: VBoxContainer, to_form: VBoxContainer) -> void:
 # ─────────────────────────────────────────────────────────────────────────────
 func _on_login_pressed() -> void:
 	var username: String = login_username.text.strip_edges()
-	var password: String = login_password.text
+	var password: String = login_password.text.strip_edges()
 
 	if username.is_empty() or password.is_empty():
 		_set_msg(login_msg, "⚠ Please fill out all fields.", MSG_COLOR_ERROR)
@@ -155,7 +167,7 @@ func _on_login_pressed() -> void:
 	_start_loading_animation()
 	var start_time = Time.get_ticks_msec()
 	
-	var result: Dictionary = SessionManager.login_user(username, password)
+	var result: Dictionary = await SessionManager.login_user(username, password)
 	
 	var elapsed = (Time.get_ticks_msec() - start_time) / 1000.0
 	if elapsed < 0.5:
@@ -185,14 +197,18 @@ func _on_login_pressed() -> void:
 
 func _on_signup_pressed() -> void:
 	var username: String = signup_username.text.strip_edges()
-	var password: String = signup_password.text
-	var confirm:  String = signup_confirm.text
+	var email:    String = signup_email.text.strip_edges()
+	var password: String = signup_password.text.strip_edges()
+	var confirm:  String = signup_confirm.text.strip_edges()
 
 	if username.length() < 4:
 		_set_msg(signup_msg, "⚠ Username must be at least 4 characters.", MSG_COLOR_ERROR)
 		return
-	if password.length() < 6:
-		_set_msg(signup_msg, "⚠ Password must be at least 6 characters.", MSG_COLOR_ERROR)
+	if not "@" in email or not "." in email:
+		_set_msg(signup_msg, "⚠ Please enter a valid email address.", MSG_COLOR_ERROR)
+		return
+	if password.length() < 8:
+		_set_msg(signup_msg, "⚠ Password must be at least 8 characters.", MSG_COLOR_ERROR)
 		return
 	if password != confirm:
 		_set_msg(signup_msg, "⚠ Passwords do not match!", MSG_COLOR_ERROR)
@@ -203,7 +219,7 @@ func _on_signup_pressed() -> void:
 	_start_loading_animation()
 	var start_time = Time.get_ticks_msec()
 	
-	var result: Dictionary = SessionManager.register_user(username, password)
+	var result: Dictionary = await SessionManager.register_user(username, password)
 	
 	var elapsed = (Time.get_ticks_msec() - start_time) / 1000.0
 	if elapsed < 0.5:
@@ -231,10 +247,13 @@ func _clear_fields() -> void:
 	login_username.text = ""
 	login_password.text = ""
 	signup_username.text = ""
+	signup_email.text = ""
 	signup_password.text = ""
 	signup_confirm.text = ""
-	login_username.remove_theme_stylebox_override("normal")
-	signup_username.remove_theme_stylebox_override("normal")
+	if default_field_style:
+		login_username.add_theme_stylebox_override("normal", default_field_style)
+		signup_username.add_theme_stylebox_override("normal", default_field_style)
+		signup_email.add_theme_stylebox_override("normal", default_field_style)
 	if has_node("SignupForm/StrengthBar"):
 		get_node("SignupForm/StrengthBar").value = 0
 	_set_msg(login_msg, "", MSG_COLOR_INFO)
@@ -253,20 +272,33 @@ func _shake(target: Control) -> void:
 # ─────────────────────────────────────────────────────────────────────────────
 # UX SYSTEMS — VALIDATION, SPINNER, REMEMBER ME, FORGOT PW, TRANSITIONS
 # ─────────────────────────────────────────────────────────────────────────────
-func _validate_username_field(line_edit: LineEdit) -> void:
-	var text = line_edit.text.strip_edges()
-	if text.is_empty():
-		line_edit.remove_theme_stylebox_override("normal")
+func _validate_field(line_edit: LineEdit, is_email: bool) -> void:
+	var t = line_edit.text.strip_edges()
+	var error_msg = ""
+	
+	if t.length() > 0:
+		if is_email:
+			if not "@" in t or not "." in t:
+				error_msg = "⚠ Please enter a valid email address."
+		else:
+			if t.length() < 4:
+				error_msg = "⚠ Username must be at least 4 characters."
+			
+	if line_edit == login_username:
+		_set_msg(login_msg, error_msg, MSG_COLOR_ERROR if error_msg else MSG_COLOR_INFO)
+	else:
+		_set_msg(signup_msg, error_msg, MSG_COLOR_ERROR if error_msg else MSG_COLOR_INFO)
+
+	if t.length() == 0:
+		if default_field_style:
+			line_edit.add_theme_stylebox_override("normal", default_field_style)
 		return
+
+	var is_valid = error_msg == ""
 		
-	var is_valid = text.length() >= 4 and text.length() <= 24
-	if is_valid:
-		var regex = RegEx.new()
-		regex.compile("^[a-zA-Z0-9_]+$")
-		is_valid = regex.search(text) != null
-		
-	var style = line_edit.get_theme_stylebox("normal").duplicate() as StyleBoxFlat
-	if style:
+	if default_field_style:
+		var style = default_field_style.duplicate() as StyleBoxFlat
+		style.bg_color = Color.WHITE
 		style.border_width_left = 2
 		style.border_width_top = 2
 		style.border_width_right = 2
@@ -348,14 +380,35 @@ func _set_buttons_disabled(disabled: bool) -> void:
 	if is_instance_valid(forgot_pw_btn):
 		forgot_pw_btn.disabled = disabled
 
-func _setup_remember_me() -> void:
+func _setup_login_options_row() -> void:
+	var options_hbox = HBoxContainer.new()
+	options_hbox.name = "LoginOptionsHBox"
+	
+	# Remember me on the left
 	remember_me_checkbox = CheckBox.new()
 	remember_me_checkbox.name = "RememberMeCheckBox"
 	remember_me_checkbox.text = "Remember me"
-	remember_me_checkbox.add_theme_font_size_override("font_size", 16)
-	login_form.add_child(remember_me_checkbox)
+	remember_me_checkbox.add_theme_font_size_override("font_size", 14)
+	options_hbox.add_child(remember_me_checkbox)
+	
+	# Spacer to push Forgot PW to the right
+	var spacer = Control.new()
+	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	options_hbox.add_child(spacer)
+	
+	# Forgot password on the right
+	forgot_pw_btn = Button.new()
+	forgot_pw_btn.name = "ForgotPasswordBtn"
+	forgot_pw_btn.text = "Forgot Password?"
+	forgot_pw_btn.flat = true
+	forgot_pw_btn.add_theme_font_size_override("font_size", 14)
+	forgot_pw_btn.add_theme_color_override("font_color", Color(0.65, 0.85, 1.00))
+	options_hbox.add_child(forgot_pw_btn)
+	
+	login_form.add_child(options_hbox)
 	var idx = login_password.get_index()
-	login_form.move_child(remember_me_checkbox, idx + 1)
+	login_form.move_child(options_hbox, idx + 1)
+	forgot_pw_btn.pressed.connect(_on_forgot_pw_pressed)
 	
 	var cfg = ConfigFile.new()
 	var err = cfg.load("user://last_user.cfg")
@@ -364,18 +417,6 @@ func _setup_remember_me() -> void:
 		if not last_user.is_empty():
 			login_username.text = last_user
 			remember_me_checkbox.button_pressed = true
-
-func _setup_forgot_password_btn() -> void:
-	forgot_pw_btn = Button.new()
-	forgot_pw_btn.name = "ForgotPasswordBtn"
-	forgot_pw_btn.text = "Forgot Password?"
-	forgot_pw_btn.flat = true
-	forgot_pw_btn.add_theme_font_size_override("font_size", 14)
-	forgot_pw_btn.add_theme_color_override("font_color", Color(0.65, 0.85, 1.00))
-	login_form.add_child(forgot_pw_btn)
-	var idx = remember_me_checkbox.get_index()
-	login_form.move_child(forgot_pw_btn, idx + 1)
-	forgot_pw_btn.pressed.connect(_on_forgot_pw_pressed)
 
 func _on_forgot_pw_pressed() -> void:
 	if forgot_popup:
@@ -596,17 +637,49 @@ func _animate_login_success() -> void:
 	)
 
 func _setup_password_visibility_toggle() -> void:
-	var toggle_btn = Button.new()
-	toggle_btn.name = "TogglePasswordBtn"
-	toggle_btn.text = "👁 Show Password"
-	toggle_btn.flat = true
-	toggle_btn.add_theme_font_size_override("font_size", 14)
-	toggle_btn.add_theme_color_override("font_color", Color(0.65, 0.85, 1.00))
-	login_form.add_child(toggle_btn)
-	var idx = login_password.get_index()
-	login_form.move_child(toggle_btn, idx + 1)
+	# Login form toggle (right-aligned)
+	var login_hbox = HBoxContainer.new()
+	var l_spacer = Control.new()
+	l_spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	login_hbox.add_child(l_spacer)
 	
-	toggle_btn.pressed.connect(func():
+	var login_toggle = Button.new()
+	login_toggle.name = "ToggleLoginPasswordBtn"
+	login_toggle.text = "👁 Show Password"
+	login_toggle.flat = true
+	login_toggle.add_theme_font_size_override("font_size", 14)
+	login_toggle.add_theme_color_override("font_color", Color(0.65, 0.85, 1.00))
+	login_hbox.add_child(login_toggle)
+	
+	login_form.add_child(login_hbox)
+	login_form.move_child(login_hbox, login_username.get_index() + 1)
+	
+	login_toggle.pressed.connect(func():
 		login_password.secret = not login_password.secret
-		toggle_btn.text = "👁 Hide Password" if not login_password.secret else "👁 Show Password"
+		login_toggle.text = "👁 Hide Password" if not login_password.secret else "👁 Show Password"
+	)
+	
+	# Signup form toggle (right-aligned)
+	var signup_hbox = HBoxContainer.new()
+	var s_spacer = Control.new()
+	s_spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	signup_hbox.add_child(s_spacer)
+	
+	var signup_toggle = Button.new()
+	signup_toggle.name = "ToggleSignupPasswordBtn"
+	signup_toggle.text = "👁 Show Passwords"
+	signup_toggle.flat = true
+	signup_toggle.add_theme_font_size_override("font_size", 14)
+	signup_toggle.add_theme_color_override("font_color", Color(0.65, 0.85, 1.00))
+	signup_hbox.add_child(signup_toggle)
+	
+	signup_form.add_child(signup_hbox)
+	# User wants it right side of the password fields. Moving it below signup_password
+	signup_form.move_child(signup_hbox, signup_password.get_index() + 1)
+	
+	signup_toggle.pressed.connect(func():
+		var show = signup_password.secret
+		signup_password.secret = not show
+		signup_confirm.secret = not show
+		signup_toggle.text = "👁 Hide Passwords" if show else "👁 Show Passwords"
 	)

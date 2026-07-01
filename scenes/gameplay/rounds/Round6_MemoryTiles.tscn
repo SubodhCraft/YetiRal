@@ -147,7 +147,7 @@ modulate = Color(1.0, 0.85, 1.0, 1.0)
 ; This large dark box sits at Y=-12, filling everything below with a dark purple.
 ; The fog above + this plane means falling players see a clean thematic void,
 ; not engine background seeping through.
-[node name="AbyssPlane" type="CSGBox3D" parent="MapGeometry"]
+[node name="AbyssPlane" type="CSGBox3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -13.5, 0)
 size = Vector3(200, 3, 200)
 use_collision = false
@@ -494,23 +494,3 @@ material = SubResource("Mat_Gold")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -10, 0)
 size = Vector3(30, 1, 30)
 material = SubResource("Mat_Abyss")
-
-[node name="Sweeper" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
-
-[node name="SweeperBase" type="CSGCylinder3D" parent="Sweeper"]
-radius = 1.0
-height = 2.0
-material = SubResource("Mat_Platform")
-
-[node name="SweeperArm" type="AnimatableBody3D" parent="Sweeper"]
-collision_layer = 1
-collision_mask = 2
-sync_to_physics = false
-
-[node name="MeshInstance3D" type="CSGBox3D" parent="Sweeper/SweeperArm"]
-size = Vector3(20, 1, 1)
-material = SubResource("Mat_Gold")
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Sweeper/SweeperArm"]
-shape = SubResource("Shape_Sweeper")

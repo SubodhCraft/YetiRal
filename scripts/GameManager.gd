@@ -56,6 +56,9 @@ func start_game() -> void:
 	shown_facts.clear()
 	is_transitioning = false
 	stats_changed.emit()
+	# Track that a match was started
+	if SessionManager and SessionManager.is_logged_in():
+		SessionManager.increment_matches_played(SessionManager.get_current_user())
 	_load_sp_round()
 
 func _load_sp_round() -> void:
@@ -131,6 +134,9 @@ func show_game_over() -> void:
 
 func show_victory() -> void:
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	# Track win for the current user
+	if SessionManager and SessionManager.is_logged_in():
+		SessionManager.increment_wins(SessionManager.get_current_user())
 	get_tree().call_deferred("change_scene_to_file", VICTORY_SCENE)
 
 func return_to_dashboard() -> void:

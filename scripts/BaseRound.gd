@@ -57,6 +57,7 @@ func _ready() -> void:
 		kill_zone.body_entered.connect(_on_kill_zone_body_entered)
 	if finish_zone:
 		finish_zone.body_entered.connect(_on_finish_zone_body_entered)
+		_build_finish_banner()
 
 	# ── Feature 1: connect each checkpoint Area3D ─────────────────────────────
 	for cp: Marker3D in checkpoints:
@@ -97,6 +98,25 @@ func _freeze_local_players() -> void:
 				child.set_physics_process(false)
 				child.set_process_unhandled_input(false)
 				child.set_process_input(false)
+
+func _build_finish_banner() -> void:
+	if not finish_zone:
+		return
+		
+	var banner = Label3D.new()
+	banner.text = "FINISH 🏁"
+	banner.font_size = 200
+	banner.outline_size = 20
+	banner.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+	banner.modulate = Color(1.0, 0.84, 0.0) # Golden yellow
+	banner.position = Vector3(0, 4.0, 0) # Float 4 units above the finish zone
+	
+	# Add a slight bobbing animation
+	var tw = create_tween().set_loops().set_trans(Tween.TRANS_SINE)
+	tw.tween_property(banner, "position:y", 4.5, 1.5)
+	tw.tween_property(banner, "position:y", 4.0, 1.5)
+	
+	finish_zone.add_child(banner)
 
 ## Re-enables physics and input for non-spectator local players.
 ## Called by _begin_intro_countdown() after "GO!" completes.
@@ -172,6 +192,7 @@ func _setup_hud() -> void:
 		hud = hud_res.instantiate()
 		add_child(hud)
 		hud.set_round_name(round_name)
+		hud.update_timer(time_remaining, time_limit)
 		_update_hud_stats()
 		if GameManager.has_signal("stats_changed"):
 			GameManager.stats_changed.connect(_update_hud_stats)
@@ -514,16 +535,16 @@ func _show_round_info_card() -> void:
 
 	var card_style = StyleBoxFlat.new()
 	card_style.bg_color = Color(0.06, 0.07, 0.12, 1.0)
-	card_style.corner_radius_top_left    = 18
+	card_style.corner_radius_top_left	= 18
 	card_style.corner_radius_top_right   = 18
 	card_style.corner_radius_bottom_right = 18
 	card_style.corner_radius_bottom_left  = 18
 	card_style.content_margin_left   = 50
 	card_style.content_margin_right  = 50
-	card_style.content_margin_top    = 40
+	card_style.content_margin_top	= 40
 	card_style.content_margin_bottom = 40
 	card_style.border_width_left   = 3
-	card_style.border_width_top    = 3
+	card_style.border_width_top	= 3
 	card_style.border_width_right  = 3
 	card_style.border_width_bottom = 3
 	card_style.border_color = Color(0.18, 0.82, 0.46)
@@ -544,7 +565,41 @@ func _show_round_info_card() -> void:
 
 	vbox.add_child(HSeparator.new())
 
-	# Objective header
+	# Round Journey mini-list
+	var journey_hdr = Label.new()
+	journey_hdr.text = "🗺️  ROUND JOURNEY (8 Rounds)"
+	journey_hdr.add_theme_font_size_override("font_size", 16)
+	journey_hdr.add_theme_color_override("font_color", Color(0.65, 0.85, 1.0))
+	vbox.add_child(journey_hdr)
+
+	var round_names: Array[String] = [
+		"1 · Himalayan Climb 🏔",
+		"2 · Boudha Spinners ☸",
+		"3 · Trishuli Crossing 🌊",
+		"4 · Kathmandu Dash 🏃",
+		"5 · Glacier Melt ❄",
+		"6 · Bhanjyang Balance 🧊",
+		"7 · Lava Doors 🌋",
+		"8 · Avalanche Run 🌨",
+	]
+	var current_idx = GameManager.current_round_index if GameManager else 0
+	var journey_grid = HFlowContainer.new()
+	journey_grid.add_theme_constant_override("h_separation", 16)
+	journey_grid.add_theme_constant_override("v_separation", 6)
+	for i in round_names.size():
+		var rn_lbl = Label.new()
+		rn_lbl.text = round_names[i]
+		rn_lbl.add_theme_font_size_override("font_size", 13)
+		if i == current_idx:
+			rn_lbl.add_theme_color_override("font_color", Color(0.2, 1.0, 0.6))
+		elif i < current_idx:
+			rn_lbl.add_theme_color_override("font_color", Color(0.5, 0.5, 0.5))
+		else:
+			rn_lbl.add_theme_color_override("font_color", Color(0.85, 0.85, 0.85))
+		journey_grid.add_child(rn_lbl)
+	vbox.add_child(journey_grid)
+
+	vbox.add_child(HSeparator.new())
 	var obj_hdr = Label.new()
 	obj_hdr.text = "🎯  OBJECTIVE"
 	obj_hdr.add_theme_font_size_override("font_size", 22)
@@ -585,7 +640,7 @@ func _show_round_info_card() -> void:
 
 	var btn_normal = StyleBoxFlat.new()
 	btn_normal.bg_color = Color(0.18, 0.80, 0.44)
-	btn_normal.corner_radius_top_left    = 12
+	btn_normal.corner_radius_top_left	= 12
 	btn_normal.corner_radius_top_right   = 12
 	btn_normal.corner_radius_bottom_right = 12
 	btn_normal.corner_radius_bottom_left  = 12
@@ -593,7 +648,7 @@ func _show_round_info_card() -> void:
 
 	var btn_hover = StyleBoxFlat.new()
 	btn_hover.bg_color = Color(0.12, 0.62, 0.34)
-	btn_hover.corner_radius_top_left    = 12
+	btn_hover.corner_radius_top_left	= 12
 	btn_hover.corner_radius_top_right   = 12
 	btn_hover.corner_radius_bottom_right = 12
 	btn_hover.corner_radius_bottom_left  = 12
@@ -601,7 +656,7 @@ func _show_round_info_card() -> void:
 
 	var btn_pressed = StyleBoxFlat.new()
 	btn_pressed.bg_color = Color(0.10, 0.50, 0.28)
-	btn_pressed.corner_radius_top_left    = 12
+	btn_pressed.corner_radius_top_left	= 12
 	btn_pressed.corner_radius_top_right   = 12
 	btn_pressed.corner_radius_bottom_right = 12
 	btn_pressed.corner_radius_bottom_left  = 12

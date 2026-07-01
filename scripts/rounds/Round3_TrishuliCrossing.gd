@@ -22,12 +22,12 @@ func _ready() -> void:
 	# Round 3 has no mid-round checkpoints — failing always reloads from the start
 	checkpoints.clear()
 	
-	super._ready()
 	round_name = "ROUND 3: TRISHULI CROSSING"
 	round_type = RoundType.RACE
 	yeti_fact_index = 2
 	time_limit = 90.0
 	
+	super._ready()
 	_build_trishuli_course()
 
 func _build_trishuli_course() -> void:

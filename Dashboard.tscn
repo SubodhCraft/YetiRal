@@ -1,6 +1,7 @@
-[gd_scene load_steps=18 format=3 uid="uid://dash_main"]
+[gd_scene load_steps=19 format=3 uid="uid://dash_main"]
 
 [ext_resource type="Script" path="res://scripts/Dashboard.gd" id="1_dash"]
+[ext_resource type="Texture2D" path="res://assets/events_page/Event.png" id="event_banner_tex"]
 
 ; ══════════════════════════════════════════════════════════════════════════════
 ; STYLES
@@ -380,22 +381,24 @@ theme_override_constants/separation = 24
 
 [node name="ProfileCard" type="PanelContainer" parent="MainVBox/BodyHBox/ContentMargin/LobbyView/LeftCol"]
 layout_mode = 2
-custom_minimum_size = Vector2(0, 260)
+custom_minimum_size = Vector2(0, 340)
+size_flags_vertical = 3
 theme_override_styles/panel = SubResource("SB_card")
 
 [node name="Margin" type="MarginContainer" parent="MainVBox/BodyHBox/ContentMargin/LobbyView/LeftCol/ProfileCard"]
 layout_mode = 2
-theme_override_constants/margin_left = 24
-theme_override_constants/margin_top = 24
-theme_override_constants/margin_right = 24
-theme_override_constants/margin_bottom = 24
+theme_override_constants/margin_left = 0
+theme_override_constants/margin_top = 0
+theme_override_constants/margin_right = 0
+theme_override_constants/margin_bottom = 0
 
-[node name="Label" type="Label" parent="MainVBox/BodyHBox/ContentMargin/LobbyView/LeftCol/ProfileCard/Margin"]
+[node name="EventBanner" type="TextureRect" parent="MainVBox/BodyHBox/ContentMargin/LobbyView/LeftCol/ProfileCard/Margin"]
 layout_mode = 2
-text = "[ Massive Player Identity Card ]
-Shows Big Avatar, XP Bar, Level"
-horizontal_alignment = 1
-theme_override_colors/font_color = Color(0.5, 0.55, 0.6, 1.0)
+texture = ExtResource("event_banner_tex")
+expand_mode = 1
+stretch_mode = 5
+size_flags_horizontal = 3
+size_flags_vertical = 3
 
 [node name="BottomRow" type="HBoxContainer" parent="MainVBox/BodyHBox/ContentMargin/LobbyView/LeftCol"]
 layout_mode = 2
@@ -458,11 +461,107 @@ layout_mode = 2
 size_flags_vertical = 3
 theme_override_styles/panel = SubResource("SB_card")
 
-[node name="Label" type="Label" parent="MainVBox/BodyHBox/ContentMargin/LobbyView/RightCol/SocialCard"]
+[node name="Margin" type="MarginContainer" parent="MainVBox/BodyHBox/ContentMargin/LobbyView/RightCol/SocialCard"]
 layout_mode = 2
-text = "Social / Friends"
-horizontal_alignment = 1
-theme_override_colors/font_color = Color(0.5, 0.55, 0.6, 1.0)
+theme_override_constants/margin_left = 32
+theme_override_constants/margin_top = 32
+theme_override_constants/margin_right = 32
+theme_override_constants/margin_bottom = 32
+
+[node name="HBox" type="HBoxContainer" parent="MainVBox/BodyHBox/ContentMargin/LobbyView/RightCol/SocialCard/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 32
+
+[node name="LeftCol" type="VBoxContainer" parent="MainVBox/BodyHBox/ContentMargin/LobbyView/RightCol/SocialCard/Margin/HBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 16
+
+[node name="MyUIDLabel" type="Label" parent="MainVBox/BodyHBox/ContentMargin/LobbyView/RightCol/SocialCard/Margin/HBox/LeftCol"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Your UID: "
+theme_override_font_sizes/font_size = 20
+theme_override_colors/font_color = Color(0.32, 0.66, 0.66, 1.0)
+
+[node name="AddFriendSection" type="VBoxContainer" parent="MainVBox/BodyHBox/ContentMargin/LobbyView/RightCol/SocialCard/Margin/HBox/LeftCol"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="AddFriendLabel" type="Label" parent="MainVBox/BodyHBox/ContentMargin/LobbyView/RightCol/SocialCard/Margin/HBox/LeftCol/AddFriendSection"]
+layout_mode = 2
+text = "Add Friend by UID"
+theme_override_font_sizes/font_size = 14
+
+[node name="FriendHBox" type="HBoxContainer" parent="MainVBox/BodyHBox/ContentMargin/LobbyView/RightCol/SocialCard/Margin/HBox/LeftCol/AddFriendSection"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="FriendUIDInput" type="LineEdit" parent="MainVBox/BodyHBox/ContentMargin/LobbyView/RightCol/SocialCard/Margin/HBox/LeftCol/AddFriendSection/FriendHBox"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "Enter Player UID"
+
+[node name="AddFriendBtn" type="Button" parent="MainVBox/BodyHBox/ContentMargin/LobbyView/RightCol/SocialCard/Margin/HBox/LeftCol/AddFriendSection/FriendHBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(120, 0)
+layout_mode = 2
+text = "Add Friend"
+
+[node name="SocialMsg" type="Label" parent="MainVBox/BodyHBox/ContentMargin/LobbyView/RightCol/SocialCard/Margin/HBox/LeftCol"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.4, 0.4, 1.0)
+
+[node name="Spacer" type="Control" parent="MainVBox/BodyHBox/ContentMargin/LobbyView/RightCol/SocialCard/Margin/HBox/LeftCol"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="RightCol" type="VBoxContainer" parent="MainVBox/BodyHBox/ContentMargin/LobbyView/RightCol/SocialCard/Margin/HBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 20
+
+[node name="RequestsHeader" type="HBoxContainer" parent="MainVBox/BodyHBox/ContentMargin/LobbyView/RightCol/SocialCard/Margin/HBox/RightCol"]
+layout_mode = 2
+
+[node name="RequestsLabel" type="Label" parent="MainVBox/BodyHBox/ContentMargin/LobbyView/RightCol/SocialCard/Margin/HBox/RightCol/RequestsHeader"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Friend Requests"
+theme_override_font_sizes/font_size = 18
+
+[node name="RefreshSocialBtn" type="Button" parent="MainVBox/BodyHBox/ContentMargin/LobbyView/RightCol/SocialCard/Margin/HBox/RightCol/RequestsHeader"]
+unique_name_in_owner = true
+layout_mode = 2
+text = " 🔄 Refresh "
+
+[node name="RequestsScroll" type="ScrollContainer" parent="MainVBox/BodyHBox/ContentMargin/LobbyView/RightCol/SocialCard/Margin/HBox/RightCol"]
+custom_minimum_size = Vector2(0, 150)
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="RequestsVBox" type="VBoxContainer" parent="MainVBox/BodyHBox/ContentMargin/LobbyView/RightCol/SocialCard/Margin/HBox/RightCol/RequestsScroll"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="FriendsLabel" type="Label" parent="MainVBox/BodyHBox/ContentMargin/LobbyView/RightCol/SocialCard/Margin/HBox/RightCol"]
+layout_mode = 2
+text = "Friends List"
+theme_override_font_sizes/font_size = 18
+
+[node name="FriendsScroll" type="ScrollContainer" parent="MainVBox/BodyHBox/ContentMargin/LobbyView/RightCol/SocialCard/Margin/HBox/RightCol"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="FriendsVBox" type="VBoxContainer" parent="MainVBox/BodyHBox/ContentMargin/LobbyView/RightCol/SocialCard/Margin/HBox/RightCol/FriendsScroll"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
 
 ; ── 2. PROFILE VIEW ──────────────────
 [node name="ProfileView" type="VBoxContainer" parent="MainVBox/BodyHBox/ContentMargin"]
@@ -565,98 +664,10 @@ layout_mode = 2
 size_flags_vertical = 3
 theme_override_styles/panel = SubResource("SB_card")
 
-[node name="Margin" type="MarginContainer" parent="MainVBox/BodyHBox/ContentMargin/SocialView/SocialCard"]
+[node name="Label" type="Label" parent="MainVBox/BodyHBox/ContentMargin/SocialView/SocialCard"]
 layout_mode = 2
-theme_override_constants/margin_left = 32
-theme_override_constants/margin_top = 32
-theme_override_constants/margin_right = 32
-theme_override_constants/margin_bottom = 32
-
-[node name="HBox" type="HBoxContainer" parent="MainVBox/BodyHBox/ContentMargin/SocialView/SocialCard/Margin"]
-layout_mode = 2
-theme_override_constants/separation = 32
-
-[node name="LeftCol" type="VBoxContainer" parent="MainVBox/BodyHBox/ContentMargin/SocialView/SocialCard/Margin/HBox"]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_constants/separation = 16
-
-[node name="MyUIDLabel" type="Label" parent="MainVBox/BodyHBox/ContentMargin/SocialView/SocialCard/Margin/HBox/LeftCol"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "Your UID: "
-theme_override_font_sizes/font_size = 20
-theme_override_colors/font_color = Color(0.32, 0.66, 0.66, 1.0)
-
-[node name="AddFriendSection" type="VBoxContainer" parent="MainVBox/BodyHBox/ContentMargin/SocialView/SocialCard/Margin/HBox/LeftCol"]
-layout_mode = 2
-theme_override_constants/separation = 8
-
-[node name="AddFriendLabel" type="Label" parent="MainVBox/BodyHBox/ContentMargin/SocialView/SocialCard/Margin/HBox/LeftCol/AddFriendSection"]
-layout_mode = 2
-text = "Add Friend by UID"
-theme_override_font_sizes/font_size = 14
-
-[node name="FriendHBox" type="HBoxContainer" parent="MainVBox/BodyHBox/ContentMargin/SocialView/SocialCard/Margin/HBox/LeftCol/AddFriendSection"]
-layout_mode = 2
-theme_override_constants/separation = 12
-
-[node name="FriendUIDInput" type="LineEdit" parent="MainVBox/BodyHBox/ContentMargin/SocialView/SocialCard/Margin/HBox/LeftCol/AddFriendSection/FriendHBox"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 3
-placeholder_text = "Enter Player UID"
-
-[node name="AddFriendBtn" type="Button" parent="MainVBox/BodyHBox/ContentMargin/SocialView/SocialCard/Margin/HBox/LeftCol/AddFriendSection/FriendHBox"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(120, 0)
-layout_mode = 2
-text = "Add Friend"
-
-[node name="SocialMsg" type="Label" parent="MainVBox/BodyHBox/ContentMargin/SocialView/SocialCard/Margin/HBox/LeftCol"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_colors/font_color = Color(0.8, 0.4, 0.4, 1.0)
-
-[node name="Spacer" type="Control" parent="MainVBox/BodyHBox/ContentMargin/SocialView/SocialCard/Margin/HBox/LeftCol"]
-layout_mode = 2
-size_flags_vertical = 3
-
-[node name="RightCol" type="VBoxContainer" parent="MainVBox/BodyHBox/ContentMargin/SocialView/SocialCard/Margin/HBox"]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_constants/separation = 20
-
-[node name="RequestsLabel" type="Label" parent="MainVBox/BodyHBox/ContentMargin/SocialView/SocialCard/Margin/HBox/RightCol"]
-layout_mode = 2
-text = "Friend Requests"
-theme_override_font_sizes/font_size = 18
-
-[node name="RequestsScroll" type="ScrollContainer" parent="MainVBox/BodyHBox/ContentMargin/SocialView/SocialCard/Margin/HBox/RightCol"]
-custom_minimum_size = Vector2(0, 150)
-layout_mode = 2
-size_flags_vertical = 3
-
-[node name="RequestsVBox" type="VBoxContainer" parent="MainVBox/BodyHBox/ContentMargin/SocialView/SocialCard/Margin/HBox/RightCol/RequestsScroll"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_constants/separation = 8
-
-[node name="FriendsLabel" type="Label" parent="MainVBox/BodyHBox/ContentMargin/SocialView/SocialCard/Margin/HBox/RightCol"]
-layout_mode = 2
-text = "Friends List"
-theme_override_font_sizes/font_size = 18
-
-[node name="FriendsScroll" type="ScrollContainer" parent="MainVBox/BodyHBox/ContentMargin/SocialView/SocialCard/Margin/HBox/RightCol"]
-layout_mode = 2
-size_flags_vertical = 3
-
-[node name="FriendsVBox" type="VBoxContainer" parent="MainVBox/BodyHBox/ContentMargin/SocialView/SocialCard/Margin/HBox/RightCol/FriendsScroll"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_constants/separation = 8
+text = "Social features moved to Dashboard."
+horizontal_alignment = 1
 
 ; ══════════════════════════════════════════════════════════════════════════════
 ; GAME MODE MODAL
@@ -753,7 +764,7 @@ theme_override_colors/font_color = Color(0.0, 0.0, 0.0, 1.0)
 unique_name_in_owner = true
 layout_mode = 2
 custom_minimum_size = Vector2(0, 50)
-placeholder_text = "Enter Room Code"
+placeholder_text = "Enter Host IP or Room Code"
 alignment = 1
 
 [node name="JoinRoomBtn" type="Button" parent="GameModeModal/Center/Panel/Margin/VBox/MultiplayerBox"]

@@ -194,11 +194,11 @@ autowrap_mode = 3
 custom_minimum_size = Vector2(0, 8)
 layout_mode = 2
 
-[node name="EmailLabel" type="Label" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/LoginForm" unique_id=1878044091]
+[node name="UserLabel" type="Label" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/LoginForm" unique_id=1878044091]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.8, 0.85, 0.9, 1)
 theme_override_font_sizes/font_size = 11
-text = "Email Address"
+text = "Username"
 
 [node name="LoginUsernameField" type="LineEdit" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/LoginForm" unique_id=1216557855]
 unique_name_in_owner = true
@@ -210,7 +210,7 @@ theme_override_colors/caret_color = Color(0.2, 0.2, 0.2, 1)
 theme_override_colors/selection_color = Color(0.8, 0.9, 1, 1)
 theme_override_styles/normal = SubResource("SB_field_n")
 theme_override_styles/focus = SubResource("SB_field_f")
-placeholder_text = "✉ explorer@himalayas.com"
+placeholder_text = "👤 explorer"
 
 [node name="PasswordHBox" type="HBoxContainer" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/LoginForm" unique_id=70366604]
 layout_mode = 2
@@ -222,11 +222,6 @@ theme_override_colors/font_color = Color(0.8, 0.85, 0.9, 1)
 theme_override_font_sizes/font_size = 11
 text = "Password"
 
-[node name="ForgotLabel" type="Label" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/LoginForm/PasswordHBox" unique_id=227331238]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.4, 0.75, 0.75, 1)
-theme_override_font_sizes/font_size = 11
-text = "Forgot Password?"
 
 [node name="LoginPasswordField" type="LineEdit" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/LoginForm" unique_id=1538157910]
 unique_name_in_owner = true
@@ -369,7 +364,7 @@ theme_override_colors/font_color = Color(0.8, 0.85, 0.9, 1)
 theme_override_font_sizes/font_size = 11
 text = "Email Address"
 
-[node name="SignupUsernameField" type="LineEdit" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/SignupForm" unique_id=316983983]
+[node name="SignupEmailField" type="LineEdit" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/SignupForm" unique_id=316983983]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 48)
 layout_mode = 2
@@ -380,6 +375,24 @@ theme_override_colors/selection_color = Color(0.8, 0.9, 1, 1)
 theme_override_styles/normal = SubResource("SB_field_n")
 theme_override_styles/focus = SubResource("SB_field_f")
 placeholder_text = "✉ explorer@himalayas.com"
+
+[node name="UserLabel" type="Label" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/SignupForm" unique_id=992959370]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.85, 0.9, 1)
+theme_override_font_sizes/font_size = 11
+text = "Username"
+
+[node name="SignupUsernameField" type="LineEdit" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/SignupForm" unique_id=316983984]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.1, 0.1, 0.1, 1)
+theme_override_colors/font_placeholder_color = Color(0.8, 0.8, 0.8, 1)
+theme_override_colors/caret_color = Color(0.2, 0.2, 0.2, 1)
+theme_override_colors/selection_color = Color(0.8, 0.9, 1, 1)
+theme_override_styles/normal = SubResource("SB_field_n")
+theme_override_styles/focus = SubResource("SB_field_f")
+placeholder_text = "👤 explorer"
 
 [node name="PassLabel" type="Label" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/SignupForm" unique_id=1687531371]
 layout_mode = 2

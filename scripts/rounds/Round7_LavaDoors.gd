@@ -10,12 +10,13 @@ var _rng = RandomNumberGenerator.new()
 var _heat_areas: Array[Area3D] = []
 
 func _ready() -> void:
-	super._ready()
 	round_name = "ROUND 7: LAVA DOOR MONASTERY"
 	round_type = RoundType.RACE
 	yeti_fact_index = 6
-	time_limit = 75.0
+	time_limit = 20.0
 	_rng.randomize()
+	
+	super._ready()
 	
 	# Clear old nodes
 	var map_geo = get_node_or_null("MapGeometry")

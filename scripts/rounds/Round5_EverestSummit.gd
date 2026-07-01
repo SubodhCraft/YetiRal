@@ -26,12 +26,13 @@ var _rng = RandomNumberGenerator.new()
 var player_ref: CharacterBody3D = null
 
 func _ready() -> void:
-	super._ready()
-	round_name = "ROUND 5: EVEREST DEATH ZONE"
+	round_name = "ROUND 5: GLACIER MELT"
 	round_type = RoundType.SURVIVAL
 	yeti_fact_index = 4
-	time_limit = 120.0
+	time_limit = 45.0
 	_rng.randomize()
+	
+	super._ready()
 	
 	var old_geo = get_node_or_null("MapGeometry")
 	if old_geo: old_geo.queue_free()

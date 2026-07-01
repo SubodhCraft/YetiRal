@@ -16,12 +16,13 @@ func _ready() -> void:
 	# This prevents continuous mid-map respawn loops
 	checkpoints.clear()
 	
-	super._ready()
 	round_name = "ROUND 4: KATHMANDU DASH"
 	round_type = RoundType.RACE
 	yeti_fact_index = 3
 	time_limit = 90.0
 	_rng.randomize()
+	
+	super._ready()
 	
 	# Clear existing map geometry
 	var map_geo = get_node_or_null("MapGeometry")

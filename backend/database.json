@@ -1,0 +1,26 @@
+{
+    "sunil": {
+        "hash": "e65103b58afca5f7f245ddad21cad7397cd1bad551f56a7b548a7f3d1d1eb348",
+        "uid": "75D3E8DB",
+        "friends": [
+            "BD5F365C"
+        ],
+        "requests": [],
+        "equipped_hat": "none",
+        "equipped_color": "#FFFFFF",
+        "owned_hats": [],
+        "profile_pic_path": "user://profile_pic_Sunil.png"
+    },
+    "bakkar": {
+        "hash": "9d5abd4682bffa9d702dec83ad9ca3cdf5bf389d65b91b5f94b7d624587425e5",
+        "uid": "BD5F365C",
+        "friends": [
+            "75D3E8DB"
+        ],
+        "requests": [],
+        "equipped_hat": "none",
+        "equipped_color": "#FFFFFF",
+        "owned_hats": [],
+        "profile_pic_path": ""
+    }
+}

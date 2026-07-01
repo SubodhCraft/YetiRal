@@ -1,262 +1,254 @@
 extends BaseRound
 
-var crown_holder: CharacterBody3D = null
-var crown_timer: float = 30.0
-var crown_label: Label3D = null
-var _crown_area: Area3D = null
-var yeti_ai: CharacterBody3D = null
+## Round 8: AVALANCHE RUN (SNOWBALL VENDORS)
+## Two vendors throw massive snowballs across the pathway trying to
+## knock the player off.
 
-var _boulder_timer: float = 5.0
-var _boulder_spawn_x: float = 0.0
+# ── Course parameters ─────────────────────────────────────────────────────────
+const COURSE_LENGTH   : float = 120.0
+const COURSE_WIDTH	: float = 12.0
+const COURSE_SEGMENTS : int   = 24
 
-const SLIPPERY_SCRIPT = preload("res://scripts/rounds/SlipperyZone.gd")
-const WIND_SCRIPT = preload("res://scripts/rounds/WindTunnel.gd")
+# ── Vendor parameters ─────────────────────────────────────────────────────────
+const SNOWBALL_RADIUS : float = 4.0
+const THROW_FORCE	 : float = 25.0
+const THROW_INTERVAL  : float = 2.0
+
+var vendor_left_pos   : Vector3
+var vendor_right_pos  : Vector3
+var throw_timer	   : float = 0.0
+var throw_left		: bool = true
+
+# ── Materials ─────────────────────────────────────────────────────────────────
+var _mat_snow   : StandardMaterial3D
+var _mat_ice	: StandardMaterial3D
+var _mat_rock   : StandardMaterial3D
 
 func _ready() -> void:
-	super._ready()
-	round_name = "ROUND 8: YETI'S SACRED SNOWFIELD"
-	round_type = RoundType.FINAL
+	round_name	  = "ROUND 8: AVALANCHE RUN (SNOWBALL VENDORS)"
+	round_type	  = RoundType.FINAL
 	yeti_fact_index = 7
-	time_limit = 120.0
+	time_limit	  = 90.0
 	
-	_build_mountain()
-	_spawn_crown()
-	_setup_yeti_ai()
+	super._ready()
+	_build_materials()
+	_build_course()
+	_setup_vendors()
 
-func _build_mountain() -> void:
-	var map_geo = Node3D.new()
-	map_geo.name = "MapGeometry"
-	add_child(map_geo)
-	
-	var mat_ice = StandardMaterial3D.new()
-	mat_ice.albedo_color = Color(0.6, 0.8, 0.9)
-	mat_ice.emission_enabled = true
-	mat_ice.emission = Color(0.2, 0.4, 0.6)
-	mat_ice.emission_energy_multiplier = 0.5
-	
-	# Base
-	var base = CSGCylinder3D.new()
-	base.radius = 25.0
-	base.height = 4.0
-	base.position = Vector3(0, -2.0, 0)
-	base.use_collision = true
-	base.material_override = mat_ice
-	map_geo.add_child(base)
-	
-	# Tiers
-	for i in range(4):
-		var tier = CSGCylinder3D.new()
-		tier.radius = 20.0 - (i * 4.0)
-		tier.height = 3.0
-		tier.position = Vector3(0, (i * 3.0) + 1.5, 0)
-		tier.use_collision = true
-		tier.material_override = mat_ice
-		map_geo.add_child(tier)
-		
-		# Slopes (Ramps between tiers)
-		var ramp = CSGBox3D.new()
-		ramp.size = Vector3(4.0, 1.0, 8.0)
-		var angle = i * PI / 2.0
-		var r_pos = Vector3(cos(angle), 0, sin(angle)) * (tier.radius + 1.0)
-		ramp.position = r_pos + Vector3(0, (i * 3.0), 0)
-		ramp.rotation.y = -angle
-		ramp.rotation.x = PI / 6.0
-		ramp.use_collision = true
-		ramp.material_override = mat_ice
-		map_geo.add_child(ramp)
-		
-		var slip = Area3D.new()
-		slip.set_script(SLIPPERY_SCRIPT)
-		slip.set("slide_factor", 0.25)
-		slip.position = ramp.position
-		slip.rotation = ramp.rotation
-		var s_col = CollisionShape3D.new()
-		var s_box = BoxShape3D.new()
-		s_box.size = Vector3(4.0, 1.0, 8.0)
-		s_col.shape = s_box
-		slip.add_child(s_col)
-		map_geo.add_child(slip)
+# ─── Materials ────────────────────────────────────────────────────────────────
+func _build_materials() -> void:
+	_mat_snow = StandardMaterial3D.new()
+	_mat_snow.albedo_color = Color(0.93, 0.95, 1.0)
+	_mat_snow.roughness	= 0.95
 
-	# Wind Zones
-	for i in range(3):
-		var wind = Area3D.new()
-		wind.set_script(WIND_SCRIPT)
-		wind.set("lift_force", 15.0)
-		var angle = i * (PI * 2.0 / 3.0)
-		wind.position = Vector3(cos(angle) * 15.0, 4.0, sin(angle) * 15.0)
-		var wc = CollisionShape3D.new()
-		var ws = BoxShape3D.new()
-		ws.size = Vector3(6, 10, 6)
-		wc.shape = ws
-		wind.add_child(wc)
-		map_geo.add_child(wind)
-		
-		var mi = MeshInstance3D.new()
+	_mat_ice = StandardMaterial3D.new()
+	_mat_ice.albedo_color = Color(0.65, 0.82, 0.95)
+	_mat_ice.roughness	= 0.1
+	_mat_ice.metallic	 = 0.1
+
+	_mat_rock = StandardMaterial3D.new()
+	_mat_rock.albedo_color = Color(0.40, 0.38, 0.35)
+	_mat_rock.roughness	= 1.0
+
+# ─── Course ───────────────────────────────────────────────────────────────────
+func _build_course() -> void:
+	var map = Node3D.new()
+	map.name = "MapGeometry"
+	add_child(map)
+
+	var seg_len = COURSE_LENGTH / COURSE_SEGMENTS
+
+	for i in range(COURSE_SEGMENTS):
+		var body = StaticBody3D.new()
+		body.position = Vector3(0, -0.25, i * seg_len + seg_len * 0.5)
+		map.add_child(body)
+
+		var mesh = MeshInstance3D.new()
 		var bm = BoxMesh.new()
-		bm.size = Vector3(6, 10, 6)
-		mi.mesh = bm
-		var mat = StandardMaterial3D.new()
-		mat.albedo_color = Color(0.8, 0.9, 1.0, 0.3)
-		mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-		mi.material_override = mat
-		wind.add_child(mi)
+		bm.size = Vector3(COURSE_WIDTH, 0.5, seg_len + 0.05)
+		mesh.mesh = bm
+		mesh.material_override = _mat_snow.duplicate() if (i % 2 == 0) else _mat_ice.duplicate()
+		body.add_child(mesh)
 
-func _spawn_crown() -> void:
-	_crown_area = Area3D.new()
-	_crown_area.position = Vector3(0, 14.0, 0)
-	_crown_area.collision_mask = 2 # Player
+		var col = CollisionShape3D.new()
+		var box = BoxShape3D.new()
+		box.size = Vector3(COURSE_WIDTH, 0.5, seg_len + 0.05)
+		col.shape = box
+		body.add_child(col)
+
+	# Finish platform
+	var finish_plat = StaticBody3D.new()
+	finish_plat.position = Vector3(0, -0.25, COURSE_LENGTH + 3.0)
+	map.add_child(finish_plat)
+	var fp_mesh = MeshInstance3D.new()
+	var fp_bm = BoxMesh.new()
+	fp_bm.size = Vector3(COURSE_WIDTH + 4, 0.5, 8.0)
+	fp_mesh.mesh = fp_bm
+	fp_mesh.material_override = _mat_rock.duplicate()
+	finish_plat.add_child(fp_mesh)
+	var fp_col = CollisionShape3D.new()
+	var fp_box = BoxShape3D.new()
+	fp_box.size = Vector3(COURSE_WIDTH + 4, 0.5, 8.0)
+	fp_col.shape = fp_box
+	finish_plat.add_child(fp_col)
+
+	# Move key nodes
+	if spawn_point:
+		spawn_point.position = Vector3(0, 0.5, 1.0)
+	if finish_zone:
+		finish_zone.position = Vector3(0, 1.0, COURSE_LENGTH + 3.0)
+		# Make finish zone trigger volume large enough to fill the finish platform
+		if finish_zone.get_child_count() > 0 and finish_zone.get_child(0) is CollisionShape3D:
+			var fz_shape = (finish_zone.get_child(0) as CollisionShape3D).shape
+			if fz_shape is BoxShape3D:
+				fz_shape.size = Vector3(COURSE_WIDTH + 4, 6, 8)
+		else:
+			var fz_col = CollisionShape3D.new()
+			var fz_box = BoxShape3D.new()
+			fz_box.size = Vector3(COURSE_WIDTH + 4, 6, 8)
+			fz_col.shape = fz_box
+			finish_zone.add_child(fz_col)
+	if kill_zone:
+		kill_zone.position = Vector3(0, -20.0, COURSE_LENGTH * 0.5)
+		if kill_zone.get_child_count() > 0 and kill_zone.get_child(0) is CollisionShape3D:
+			var shape = (kill_zone.get_child(0) as CollisionShape3D).shape
+			if shape is BoxShape3D:
+				shape.size = Vector3(200, 5, COURSE_LENGTH + 50)
+				
+	# Add hurdles across the course
+	for h in range(1, 4):
+		var hurdle_z = COURSE_LENGTH * (float(h) / 4.0)
+		var hurdle_body = StaticBody3D.new()
+		hurdle_body.position = Vector3(0, 0.5, hurdle_z)
+		map.add_child(hurdle_body)
+		
+		var h_mesh = MeshInstance3D.new()
+		var h_bm = BoxMesh.new()
+		h_bm.size = Vector3(COURSE_WIDTH - 2.0, 1.0, 1.0)
+		h_mesh.mesh = h_bm
+		h_mesh.material_override = _mat_rock.duplicate()
+		hurdle_body.add_child(h_mesh)
+		
+		var h_col = CollisionShape3D.new()
+		var h_shape = BoxShape3D.new()
+		h_shape.size = h_bm.size
+		h_col.shape = h_shape
+		hurdle_body.add_child(h_col)
+
+func _setup_vendors() -> void:
+	# Place vendors side by side beyond the finish line
+	var end_z = COURSE_LENGTH + 8.0
 	
-	var mesh = CSGSphere3D.new()
-	mesh.radius = 0.8
+	vendor_left_pos  = Vector3(-5.0, SNOWBALL_RADIUS, end_z)
+	vendor_right_pos = Vector3(5.0, SNOWBALL_RADIUS, end_z)
+
+	_build_vendor(vendor_left_pos, "VENDOR LEFT")
+	_build_vendor(vendor_right_pos, "VENDOR RIGHT")
+
+func _build_vendor(pos: Vector3, label_text: String) -> void:
+	var body = StaticBody3D.new()
+	body.position = pos
+	add_child(body)
+	
+	var mesh = MeshInstance3D.new()
+	var bm = BoxMesh.new()
+	bm.size = Vector3(4, 8, 4)
+	mesh.mesh = bm
+	mesh.position.y = -SNOWBALL_RADIUS + 4.0
 	var mat = StandardMaterial3D.new()
-	mat.albedo_color = Color(1.0, 0.8, 0.2)
-	mat.emission_enabled = true
-	mat.emission = Color(1.0, 0.8, 0.2)
-	mat.emission_energy_multiplier = 2.0
+	mat.albedo_color = Color(0.8, 0.2, 0.2)
 	mesh.material_override = mat
-	_crown_area.add_child(mesh)
+	body.add_child(mesh)
+	
+	var col = CollisionShape3D.new()
+	var box = BoxShape3D.new()
+	box.size = Vector3(4, 8, 4)
+	col.shape = box
+	col.position.y = mesh.position.y
+	body.add_child(col)
+	
+	var lbl = Label3D.new()
+	lbl.text = label_text
+	lbl.position.y = 8.5
+	lbl.font_size = 120
+	lbl.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+	body.add_child(lbl)
+
+# ─── Process ──────────────────────────────────────────────────────────────────
+func _process(delta: float) -> void:
+	super._process(delta)
+	if not round_started or round_ended:
+		return
+		
+	throw_timer -= delta
+	if throw_timer <= 0.0:
+		throw_timer = THROW_INTERVAL
+		_throw_snowball()
+
+func _throw_snowball() -> void:
+	var ball = RigidBody3D.new()
+	
+	# Massive mass so players can't easily push it back
+	ball.mass = 500.0 
+	
+	var start_pos = vendor_left_pos if throw_left else vendor_right_pos
+	# Start slightly forward (negative Z) so it doesn't hit the vendor itself
+	start_pos.z -= 5.0
+	
+	ball.position = start_pos
+	
+	var mesh = MeshInstance3D.new()
+	var sm = SphereMesh.new()
+	sm.radius = SNOWBALL_RADIUS
+	sm.height = SNOWBALL_RADIUS * 2
+	mesh.mesh = sm
+	mesh.material_override = _mat_snow.duplicate()
+	ball.add_child(mesh)
 	
 	var col = CollisionShape3D.new()
 	var shape = SphereShape3D.new()
-	shape.radius = 1.0
+	shape.radius = SNOWBALL_RADIUS
 	col.shape = shape
-	_crown_area.add_child(col)
+	ball.add_child(col)
 	
-	_crown_area.body_entered.connect(_on_crown_touched)
-	add_child(_crown_area)
+	# Knockback Area3D
+	var hit_area = Area3D.new()
+	var hit_col = CollisionShape3D.new()
+	var hit_shape = SphereShape3D.new()
+	hit_shape.radius = SNOWBALL_RADIUS + 0.5
+	hit_col.shape = hit_shape
+	hit_area.add_child(hit_col)
+	ball.add_child(hit_area)
 	
-	crown_label = Label3D.new()
-	crown_label.font_size = 96
-	crown_label.outline_size = 8
-	crown_label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
-	crown_label.position = Vector3(0, 1.5, 0)
-	crown_label.visible = false
-	add_child(crown_label)
-
-func _setup_yeti_ai() -> void:
-	var ai_scene = load("res://scenes/gameplay/YetiAI.tscn")
-	if ai_scene:
-		yeti_ai = ai_scene.instantiate()
-		yeti_ai.position = Vector3(0, 1.0, -20.0)
-		add_child(yeti_ai)
-
-func _on_crown_touched(body: Node3D) -> void:
-	if round_ended: return
-	if body is CharacterBody3D and body != crown_holder:
-		_assign_crown(body)
-
-func _assign_crown(player: CharacterBody3D) -> void:
-	crown_holder = player
-	crown_timer = 30.0
-	
-	_crown_area.get_parent().remove_child(_crown_area)
-	player.add_child(_crown_area)
-	_crown_area.position = Vector3(0, 1.5, 0)
-	
-	crown_label.get_parent().remove_child(crown_label)
-	player.add_child(crown_label)
-	crown_label.position = Vector3(0, 2.5, 0)
-	crown_label.visible = true
-
-func _drop_crown() -> void:
-	if crown_holder:
-		crown_holder.remove_child(_crown_area)
-		add_child(_crown_area)
-		_crown_area.position = Vector3(0, 14.0, 0) # Back to summit
-		
-		crown_holder.remove_child(crown_label)
-		add_child(crown_label)
-		crown_label.visible = false
-		
-		crown_holder = null
-
-func _process(delta: float) -> void:
-	super._process(delta)
-	if round_ended: return
-	
-	_tick_boulders(delta)
-	_tick_yeti(delta)
-	
-	if crown_holder:
-		crown_timer -= delta
-		crown_label.text = str(int(ceil(crown_timer)))
-		if crown_timer <= 0.0:
-			_win_cinematic()
-	
-	# Check for player-to-player steal
-	if crown_holder:
-		var players = get_tree().get_nodes_in_group("Players")
-		for p in players:
-			if p != crown_holder and p is CharacterBody3D:
-				if p.global_position.distance_to(crown_holder.global_position) < 2.0:
-					_assign_crown(p)
-					break
-
-func _tick_boulders(delta: float) -> void:
-	_boulder_timer -= delta
-	if _boulder_timer <= 0.0:
-		_boulder_timer = 5.0
-		var boulder = RigidBody3D.new()
-		boulder.position = Vector3(randf_range(-15, 15), 20.0, randf_range(-15, 15))
-		boulder.mass = 20.0
-		var mesh = CSGSphere3D.new()
-		mesh.radius = 2.0
-		var mat = StandardMaterial3D.new()
-		mat.albedo_color = Color(0.8, 0.9, 1.0)
-		mesh.material_override = mat
-		boulder.add_child(mesh)
-		var col = CollisionShape3D.new()
-		var shape = SphereShape3D.new()
-		shape.radius = 2.0
-		col.shape = shape
-		boulder.add_child(col)
-		add_child(boulder)
-		
-		get_tree().create_timer(10.0).timeout.connect(func(): if is_instance_valid(boulder): boulder.queue_free())
-
-func _tick_yeti(delta: float) -> void:
-	if is_instance_valid(yeti_ai):
-		if crown_holder:
-			if yeti_ai.has_method("set_target_position"):
-				yeti_ai.set_target_position(crown_holder.global_position)
-			
-			if yeti_ai.global_position.distance_to(crown_holder.global_position) < 3.0:
-				var push = (crown_holder.global_position - yeti_ai.global_position).normalized()
-				push.y = 1.0
-				crown_holder.velocity = push * 20.0
-				if crown_holder.has_method("become_ragdoll"):
-					crown_holder.become_ragdoll(2.0)
-				_drop_crown()
-		else:
-			if yeti_ai.has_method("set_target_position"):
-				yeti_ai.set_target_position(Vector3(0, 14, 0)) # Go to summit
-
-func _win_cinematic() -> void:
-	round_ended = true
-	var players = get_tree().get_nodes_in_group("Players")
-	for p in players:
-		if p is CharacterBody3D:
-			p.set_physics_process(false)
-			p.set_process_input(false)
-			p.velocity = Vector3.ZERO
-	
-	if is_instance_valid(yeti_ai):
-		yeti_ai.set_physics_process(false)
-		
-	var cam = get_viewport().get_camera_3d()
-	if cam and crown_holder:
-		var tw = create_tween()
-		tw.tween_property(cam, "global_position", crown_holder.global_position + Vector3(0, 2, 5), 2.0)
-		cam.look_at(crown_holder.global_position + Vector3(0, 1, 0))
-		
-	crown_label.text = "CHAMPION!"
-	crown_label.modulate = Color(1.0, 0.8, 0.2)
-	
-	get_tree().create_timer(3.0).timeout.connect(func():
-		_show_yeti_fact_then(func(): 
-			if GameManager.is_multiplayer:
-				pass # Multi logic
+	hit_area.body_entered.connect(func(body: Node3D):
+		if body is CharacterBody3D:
+			var push_dir = (body.global_position - ball.global_position).normalized()
+			push_dir.y = 0.4
+			push_dir = push_dir.normalized()
+			if body.has_method("trigger_yeti_ragdoll"):
+				body.trigger_yeti_ragdoll(push_dir * 25.0)
 			else:
-				GameManager.show_victory()
-		)
+				body.velocity = push_dir * 30.0
 	)
+	
+	add_child(ball)
+	
+	# Shoot across the path towards the start line
+	var dir = Vector3(0, 0, -1)
+	
+	# Add a slight random X drift to make it harder
+	dir.x = randf_range(-0.15, 0.15)
+	
+	ball.apply_central_impulse(dir.normalized() * THROW_FORCE * ball.mass)
+	
+	throw_left = not throw_left
+	
+	# Clean up after 5 seconds
+	get_tree().create_timer(5.0).timeout.connect(func():
+		if is_instance_valid(ball):
+			ball.queue_free()
+	)
+
+# ─── Override objective text ──────────────────────────────────────────────────
+func _get_round_objective() -> String:
+	return "Sprint to the FINISH line! But watch out, two massive snowball vendors on the sides of the path are taking turns throwing giant snowballs at you to knock you off the mountain!"

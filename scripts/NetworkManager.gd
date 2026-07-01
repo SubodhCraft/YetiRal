@@ -90,16 +90,21 @@ func create_room() -> void:
 
 func join_via_code(code: String) -> void:
 	leave_room()
-	join_target_code = code.strip_edges().to_upper()
+	code = code.strip_edges()
+	
+	if code.is_valid_ip_address() or ":" in code or code.to_lower() == "localhost":
+		_connect_to_host(code, DEFAULT_PORT)
+		return
+		
+	join_target_code = code.to_upper()
 	
 	udp_listener = PacketPeerUDP.new()
 	var err = udp_listener.bind(UDP_BROADCAST_PORT)
 	if err != OK:
 		join_failed.emit("Failed to bind UDP listener port " + str(UDP_BROADCAST_PORT))
 		return
-	
+		
 	is_searching = true
-	
 	search_timeout_timer = Timer.new()
 	search_timeout_timer.wait_time = search_timeout
 	search_timeout_timer.one_shot = true

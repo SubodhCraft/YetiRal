@@ -17,11 +17,12 @@ var _wheel_timers: Array[float] = []
 @onready var boulder_spawner: Marker3D = $BoulderSpawner
 
 func _ready() -> void:
-	super._ready()
 	round_name = "ROUND 1: PASHUPATINATH PROCESSION"
 	round_type = RoundType.RACE
 	yeti_fact_index = 0
 	time_limit = 90.0
+	
+	super._ready()
 	_build_course()
 
 func _build_course() -> void:

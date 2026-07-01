@@ -1,10 +1,11 @@
 extends Control
 
 @onready var win_label: Label = %WinLabel if has_node("%WinLabel") else find_child("WinLabel")
+@onready var momos_label: Label = %MomosCollectedLabel if has_node("%MomosCollectedLabel") else find_child("MomosCollectedLabel")
 @onready var stats_label: Label = %StatsLabel if has_node("%StatsLabel") else find_child("StatsLabel")
 @onready var badges_container: HBoxContainer = %BadgesContainer if has_node("%BadgesContainer") else find_child("BadgesContainer")
 @onready var play_again_btn: Button = %PlayAgainBtn if has_node("%PlayAgainBtn") else find_child("PlayAgainBtn")
-@onready var main_menu_btn: Button = %MainMenuBtn if has_node("%MainMenuBtn") else find_child("MainMenuBtn")
+@onready var main_menu_btn: Button = %LobbyBtn if has_node("%LobbyBtn") else find_child("LobbyBtn")
 
 @onready var sp_container: Control = %SPContainer if has_node("%SPContainer") else find_child("SPContainer")
 @onready var mp_container: Control = %MPContainer if has_node("%MPContainer") else find_child("MPContainer")
@@ -14,6 +15,12 @@ var momos_collected: int = 0
 var xp_earned: int = 0
 
 func _ready() -> void:
+	# Read actual values directly from GameManager — fixes 0 momo bug
+	if GameManager:
+		rounds_cleared   = GameManager.current_round_index
+		momos_collected  = GameManager.momos
+		xp_earned        = rounds_cleared * 50 + momos_collected * 5
+	
 	if AudioManager:
 		AudioManager.play_track(AudioManager.MusicTrack.VICTORY)
 		
@@ -39,6 +46,9 @@ func _setup_singleplayer() -> void:
 		
 	if stats_label:
 		stats_label.text = "Rounds Cleared: %d\nMomos Collected: %d\nXP Earned: +%d" % [rounds_cleared, momos_collected, xp_earned]
+		
+	if momos_label:
+		momos_label.text = "🥟 FINAL MOMOS COLLECTED: %d" % momos_collected
 		
 	if SessionManager and SessionManager.get_current_user() != "":
 		SessionManager.log_match_result("SP", rounds_cleared, 1, momos_collected)

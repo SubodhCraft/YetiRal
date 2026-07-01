@@ -9,13 +9,13 @@ var _spinner_speeds: Array[float] = []
 var _wind_timer: float = 0.0
 
 func _ready() -> void:
-	super._ready()
 	round_name = "ROUND 2: BOUDHA SPINNERS"
 	round_type = RoundType.RACE
 	yeti_fact_index = 1
-	time_limit = 75.0
+	time_limit = 90.0
 	_wind_timer = wind_gust_interval
 	
+	super._ready()
 	_build_course()
 
 func _build_course() -> void:

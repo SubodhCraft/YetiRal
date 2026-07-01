@@ -11,6 +11,8 @@ signal session_started(username: String)
 signal session_ended()
 signal leveled_up(new_level: int, gift_amount: int)
 
+var pending_level_ups: Array[Dictionary] = []
+
 # ─────────────────────────────────────────────────────────────────────────────
 # CONSTANTS
 # ─────────────────────────────────────────────────────────────────────────────
@@ -76,32 +78,19 @@ func register_user(username: String, password: String) -> Dictionary:
 		result["message"] = "Password must be at least 6 characters."
 		return result
 
-	# Reload database to avoid race conditions between sessions
-	_load_database()
-
-	var lower_key: String = username.to_lower()
-	if _users.has(lower_key):
-		result["message"] = "Username already exists!"
+	if not APIManager:
+		result["message"] = "APIManager not found!"
 		return result
-
-	# Hash and store
-	_users[lower_key] = {
-		"hash": _hash_password(password),
-		"uid": _generate_uid_for(lower_key),
-		"friends": [],
-		"requests": [],
-		"equipped_hat": "none",
-		"equipped_color": "#FFFFFF",
-		"owned_hats": [],
-		"profile_pic_path": ""
-	}
-	var saved: bool = _save_database()
-	if not saved:
-		result["message"] = "Failed to save user data. Check disk permissions."
-		return result
-
-	result["success"] = true
-	result["message"] = "Account created! You can now log in."
+		
+	var payload = {"username": username, "password": password}
+	var res_data: Dictionary = await _make_api_call("/register", HTTPClient.METHOD_POST, payload)
+	
+	if res_data.get("success", false):
+		result["success"] = true
+		result["message"] = "Account created! You can now log in."
+	else:
+		result["message"] = res_data.get("message", "Registration failed.")
+		
 	return result
 
 
@@ -119,35 +108,77 @@ func login_user(username: String, password: String) -> Dictionary:
 		result["message"] = "Password cannot be empty."
 		return result
 
-	_load_database()
-
-	var lower_key: String = username.to_lower()
-	if not _users.has(lower_key):
-		result["message"] = "User not found. Please sign up first."
+	if not APIManager:
+		result["message"] = "APIManager not found!"
 		return result
-
-	var user_data = _users[lower_key]
-	var stored_hash: String = ""
-	if typeof(user_data) == TYPE_STRING:
-		stored_hash = user_data
-	elif typeof(user_data) == TYPE_DICTIONARY:
-		stored_hash = user_data.get("hash", "")
-
-	if stored_hash != _hash_password(password):
-		result["message"] = "Incorrect password. Please try again."
-		return result
-
-	# All good — create session
-	_is_logged_in = true
-	_current_user = username
-	_session_token = _generate_token()
+		
+	var payload = {"username": username, "password": password}
+	var res_data: Dictionary = await _make_api_call("/login", HTTPClient.METHOD_POST, payload)
 	
-	_update_login_streak(username)
-
-	emit_signal("session_started", _current_user)
-	result["success"] = true
-	result["message"] = "Login successful! Welcome, %s." % username
+	if res_data.get("success", false):
+		_is_logged_in = true
+		_current_user = username
+		_current_uid = res_data.get("uid", "")
+		_session_token = _generate_token()
+		
+		# Fetch initial stats
+		var stats_res = await _make_api_call("/stats/" + username, HTTPClient.METHOD_GET)
+		if stats_res:
+			_stats[username.to_lower()] = stats_res
+		
+		# Fetch profile data (profile pic, hat, color) from backend DB
+		var profile_res = await _make_api_call("/user/profile/" + username, HTTPClient.METHOD_GET)
+		if profile_res.get("success", false):
+			var lower_key = username.to_lower()
+			_load_database()
+			if not _users.has(lower_key):
+				_users[lower_key] = {}
+			_users[lower_key]["profile_pic_path"] = profile_res.get("profile_pic_path", "")
+			if profile_res.has("equipped_hat"):
+				_users[lower_key]["equipped_hat"] = profile_res.get("equipped_hat", "none")
+			if profile_res.has("equipped_color"):
+				_users[lower_key]["equipped_color"] = profile_res.get("equipped_color", "#FFFFFF")
+			_save_database()
+		
+		await fetch_friends_async()
+		emit_signal("session_started", _current_user)
+		result["success"] = true
+		result["message"] = "Login successful! Welcome, %s." % username
+	else:
+		result["message"] = res_data.get("message", "Login failed.")
+		
 	return result
+
+func _make_api_call(endpoint: String, method: int, payload: Dictionary = {}) -> Dictionary:
+	var req = HTTPRequest.new()
+	add_child(req)
+	var url = "http://127.0.0.1:5000" + endpoint
+	var headers = ["Content-Type: application/json"]
+	
+	var err
+	if method == HTTPClient.METHOD_GET:
+		err = req.request(url, headers, method)
+	else:
+		err = req.request(url, headers, method, JSON.stringify(payload))
+		
+	if err != OK:
+		req.queue_free()
+		return {"success": false, "message": "Connection error."}
+		
+	var response = await req.request_completed
+	req.queue_free()
+	
+	var res_result = response[0]
+	var res_code = response[1]
+	var body = response[3]
+	
+	if res_result == HTTPRequest.RESULT_SUCCESS and res_code == 200:
+		var json = JSON.new()
+		if json.parse(body.get_string_from_utf8()) == OK:
+			var data = json.get_data()
+			if typeof(data) == TYPE_DICTIONARY:
+				return data
+	return {"success": false, "message": "Server error."}
 
 
 ## Logs out the current user and clears all session data.
@@ -275,11 +306,9 @@ func _load_database() -> void:
 # ─────────────────────────────────────────────────────────────────────────────
 # PUBLIC — FRIENDS & UID
 # ─────────────────────────────────────────────────────────────────────────────
+var _current_uid: String = ""
 func get_uid(username: String = _current_user) -> String:
-	var lower_name = username.to_lower()
-	if _users.has(lower_name) and typeof(_users[lower_name]) == TYPE_DICTIONARY:
-		return _users[lower_name].get("uid", "")
-	return ""
+	return _current_uid
 
 func _generate_uid_for(username: String) -> String:
 	var ctx := HashingContext.new()
@@ -290,120 +319,43 @@ func _generate_uid_for(username: String) -> String:
 	# UID format: 8 characters
 	return hex.substr(0, 8).to_upper()
 
+var _friends_cache: Array = []
+var _requests_cache: Array = []
+
+func fetch_friends_async() -> void:
+	if not _is_logged_in: return
+	var res = await _make_api_call("/friends/list/" + _current_user, HTTPClient.METHOD_GET)
+	if res.has("friends"):
+		_friends_cache = res["friends"]
+		_requests_cache = res["requests"]
+
 func get_friends() -> Array:
-	if not _is_logged_in: return []
-	_load_database()
-	var user_data = _users[_current_user.to_lower()]
-	return user_data.get("friends", [])
+	return _friends_cache
 
 func get_friend_requests() -> Array:
-	if not _is_logged_in: return []
-	_load_database()
-	var user_data = _users[_current_user.to_lower()]
-	return user_data.get("requests", [])
+	return _requests_cache
 
 func send_friend_request(target_uid: String) -> Dictionary:
-	var result = {"success": false, "message": ""}
-	if not _is_logged_in:
-		result["message"] = "Not logged in"
-		return result
-		
-	_load_database()
-	target_uid = target_uid.to_upper()
-	
-	var target_user = ""
-	for k in _users.keys():
-		if typeof(_users[k]) == TYPE_DICTIONARY and _users[k].get("uid") == target_uid:
-			target_user = k
-			break
-			
-	if target_user == "":
-		result["message"] = "Player UID not found."
-		return result
-		
-	if target_user == _current_user.to_lower():
-		result["message"] = "You cannot add yourself."
-		return result
-		
-	var target_data = _users[target_user]
-	var my_uid = get_uid()
-	
-	if my_uid in target_data.get("friends", []):
-		result["message"] = "Already friends with this player."
-		return result
-		
-	if my_uid in target_data.get("requests", []):
-		result["message"] = "Request already sent."
-		return result
-		
-	target_data["requests"].append(my_uid)
-	_save_database()
-	
-	result["success"] = true
-	result["message"] = "Friend request sent!"
-	return result
+	var payload = {"sender": _current_user, "target_uid": target_uid}
+	var res = await _make_api_call("/friends/send_request", HTTPClient.METHOD_POST, payload)
+	await fetch_friends_async()
+	return res
 
 func accept_friend_request(requester_uid: String) -> Dictionary:
-	var result = {"success": false, "message": ""}
-	if not _is_logged_in:
-		result["message"] = "Not logged in"
-		return result
-		
-	_load_database()
-	var my_data = _users[_current_user.to_lower()]
-	var requests: Array = my_data.get("requests", [])
-	
-	if not requester_uid in requests:
-		result["message"] = "No request found from this UID."
-		return result
-		
-	var requester_user = ""
-	for k in _users.keys():
-		if typeof(_users[k]) == TYPE_DICTIONARY and _users[k].get("uid") == requester_uid:
-			requester_user = k
-			break
-			
-	if requester_user != "":
-		# Add to each other's friends lists
-		var my_uid = get_uid()
-		if not requester_uid in my_data["friends"]:
-			my_data["friends"].append(requester_uid)
-		
-		var requester_data = _users[requester_user]
-		if not my_uid in requester_data.get("friends", []):
-			requester_data["friends"].append(my_uid)
-			
-	# Remove the request
-	requests.erase(requester_uid)
-	_save_database()
-	
-	result["success"] = true
-	result["message"] = "Friend request accepted!"
-	return result
+	var payload = {"username": _current_user, "requester_uid": requester_uid}
+	var res = await _make_api_call("/friends/accept_request", HTTPClient.METHOD_POST, payload)
+	await fetch_friends_async()
+	return res
 
 func reject_friend_request(requester_uid: String) -> Dictionary:
-	var result = {"success": false, "message": ""}
-	if not _is_logged_in:
-		result["message"] = "Not logged in"
-		return result
-		
-	_load_database()
-	var my_data = _users[_current_user.to_lower()]
-	var requests: Array = my_data.get("requests", [])
-	
-	if requester_uid in requests:
-		requests.erase(requester_uid)
-		_save_database()
-		result["success"] = true
-		result["message"] = "Friend request rejected."
-	else:
-		result["message"] = "No request found from this UID."
-	return result
+	var payload = {"username": _current_user, "requester_uid": requester_uid}
+	var res = await _make_api_call("/friends/reject_request", HTTPClient.METHOD_POST, payload)
+	await fetch_friends_async()
+	return res
 
 func get_username_by_uid(uid: String) -> String:
-	for k in _users.keys():
-		if typeof(_users[k]) == TYPE_DICTIONARY and _users[k].get("uid") == uid:
-			return k
+	for f in _friends_cache:
+		if f.get("uid") == uid: return f.get("username", "Unknown")
 	return "Unknown"
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -458,9 +410,15 @@ func add_xp(username: String, amount: int) -> void:
 	if leveled_up:
 		s["momos"] += 50
 		emit_signal("leveled_up", new_level, 50)
+		pending_level_ups.append({"level": new_level, "gift": 50})
 			
 	_stats[lower_name] = s
 	_save_stats()
+
+func consume_pending_level_ups() -> Array:
+	var pending = pending_level_ups.duplicate()
+	pending_level_ups.clear()
+	return pending
 
 func _update_login_streak(username: String) -> void:
 	var lower_name = username.to_lower()
@@ -583,7 +541,10 @@ func equip_hat(hat_id: String) -> void:
 func unlock_hat(hat_id: String) -> void:
 	if not _is_logged_in:
 		return
-	var valid_hats = ["dhaka_topi", "everest_crown", "sherpa_cap", "yak_horns", "kukri_band", "none"]
+	var valid_hats = [
+		"dhaka_topi", "everest_crown", "sherpa_cap", "yak_horns", "kukri_band", "none",
+		"mountain_glasses", "apple", "banana", "cherry", "grape", "kiwi"
+	]
 	if not hat_id in valid_hats:
 		return
 		
@@ -596,6 +557,33 @@ func unlock_hat(hat_id: String) -> void:
 			owned.append(hat_id)
 			user_data["owned_hats"] = owned
 			_save_database()
+
+func get_owned_items() -> Array:
+	if not _is_logged_in:
+		return []
+	_load_database()
+	var lower_key = _current_user.to_lower()
+	var user_data = _users.get(lower_key)
+	if user_data and typeof(user_data) == TYPE_DICTIONARY:
+		return user_data.get("owned_hats", [])
+	return []
+
+func change_password(old_password: String, new_password: String) -> Dictionary:
+	if not _is_logged_in:
+		return {"ok": false, "msg": "Not logged in."}
+	if new_password.length() < 6:
+		return {"ok": false, "msg": "New password must be at least 6 characters."}
+	
+	var payload = {
+		"username": _current_user.to_lower(),
+		"old_password": old_password,
+		"new_password": new_password
+	}
+	var res = await _make_api_call("/change_password", HTTPClient.METHOD_POST, payload)
+	if res.get("success", false):
+		return {"ok": true, "msg": res.get("message", "Password changed successfully!")}
+	else:
+		return {"ok": false, "msg": res.get("message", "Password change failed.")}
 
 func get_equipped_hat(username: String = _current_user) -> String:
 	_load_database()
@@ -735,6 +723,10 @@ func set_profile_pic_path(path: String) -> void:
 	if _users.has(lower_key):
 		_users[lower_key]["profile_pic_path"] = path
 		_save_database()
+	# Also push to Flask backend so it persists across logins
+	if APIManager:
+		var payload = {"username": _current_user, "profile_pic_path": path}
+		_make_api_call("/user/set_profile_pic", HTTPClient.METHOD_POST, payload)
 
 func get_profile_pic_path(username: String = _current_user) -> String:
 	_load_database()

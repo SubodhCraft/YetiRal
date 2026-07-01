@@ -22,6 +22,9 @@ fog_density = 0.015
 [sub_resource type="BoxShape3D" id="Shape_Kill"]
 size = Vector3(120, 6, 120)
 
+[sub_resource type="BoxShape3D" id="Shape_Finish"]
+size = Vector3(16, 6, 8)
+
 [node name="Round8_YetiSnowfield" type="Node3D"]
 script = ExtResource("1_snowfield")
 
@@ -43,3 +46,10 @@ collision_mask = 2
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="KillZone"]
 shape = SubResource("Shape_Kill")
+
+[node name="FinishZone" type="Area3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.0, 123.0)
+collision_mask = 2
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="FinishZone"]
+shape = SubResource("Shape_Finish")
