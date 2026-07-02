@@ -43,7 +43,6 @@ var backend_ip: String = "127.0.0.1"
 # ─────────────────────────────────────────────────────────────────────────────
 func _ready() -> void:
 	_load_database()
-	_load_stats()
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -614,7 +613,6 @@ func get_player_title(username: String = _current_user) -> String:
 		return "Yeti Cub"
 
 func get_top_players_by_wins(count: int = 10) -> Array[Dictionary]:
-	_load_stats()
 	var list: Array[Dictionary] = []
 	for username_key in _stats:
 		var stats_data = _stats[username_key]
@@ -662,14 +660,8 @@ func update_username(new_username: String) -> Dictionary:
 	_users.erase(lower_old)
 	_save_database()
 	
-	# Migrate stats DB
-	_load_stats()
-	if _stats.has(lower_old):
-		var s_data = _stats[lower_old].duplicate(true)
-		_stats[lower_new] = s_data
-		_stats.erase(lower_old)
-		_save_stats()
-		
+	# Stats migration is server-side; the server retains the old username's stats
+	# until a dedicated rename endpoint is added.
 	_current_user = new_username
 	result["success"] = true
 	result["message"] = "Username updated successfully."
