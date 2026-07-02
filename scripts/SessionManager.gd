@@ -361,44 +361,27 @@ func get_username_by_uid(uid: String) -> String:
 	return "Unknown"
 
 # ─────────────────────────────────────────────────────────────────────────────
-# USER STATS
+# USER STATS  (server-backed — no local storage)
 # ─────────────────────────────────────────────────────────────────────────────
 var _stats: Dictionary = {}
 
 func get_user_stats(username: String) -> Dictionary:
 	var lower_name = username.to_lower()
-	_load_stats()
 	if not _stats.has(lower_name):
 		_stats[lower_name] = {
-			"matches_played": 0,
-			"wins": 0,
-			"momos": 0,
-			"xp": 0,
-			"level": 1,
-			"last_login_time": 0.0,
-			"active_days_streak": 0,
-			"badges": [],
-			"match_history": []
+			"matches_played": 0, "wins": 0, "momos": 0, "xp": 0, "level": 1,
+			"last_login_time": 0.0, "active_days_streak": 0, "badges": [], "match_history": []
 		}
-	else:
-		var s = _stats[lower_name]
-		if not s.has("xp"): s["xp"] = 0
-		if not s.has("level"): s["level"] = 1
-		if not s.has("last_login_time"): s["last_login_time"] = 0.0
-		if not s.has("active_days_streak"): s["active_days_streak"] = 0
-		if not s.has("badges"): s["badges"] = []
-		if not s.has("match_history"): s["match_history"] = []
-		_stats[lower_name] = s
 	return _stats[lower_name]
 
 func add_xp(username: String, amount: int) -> void:
 	var lower_name = username.to_lower()
 	var s = get_user_stats(username)
 	s["xp"] += amount
-	
+
 	var leveled_up = false
 	var new_level = s["level"]
-	
+
 	while true:
 		var xp_needed = s["level"] * 100
 		if s["xp"] >= xp_needed:
@@ -408,14 +391,19 @@ func add_xp(username: String, amount: int) -> void:
 			new_level = s["level"]
 		else:
 			break
-			
+
 	if leveled_up:
 		s["momos"] += 50
 		emit_signal("leveled_up", new_level, 50)
 		pending_level_ups.append({"level": new_level, "gift": 50})
-			
+
 	_stats[lower_name] = s
-	_save_stats()
+	# Persist to server
+	var payload = {"username": lower_name, "xp": s["xp"], "level": s["level"], "momos_delta": 0}
+	if leveled_up: payload["momos_delta"] = 50
+	_make_api_call("/stats/sync", HTTPClient.METHOD_POST, {
+		"username": lower_name, "xp": s["xp"], "level": s["level"], "momos": s["momos"]
+	})
 
 func consume_pending_level_ups() -> Array:
 	var pending = pending_level_ups.duplicate()
@@ -453,7 +441,12 @@ func _update_login_streak(username: String) -> void:
 				
 	s["badges"] = badges
 	_stats[lower_name] = s
-	_save_stats()
+	_make_api_call("/stats/update", HTTPClient.METHOD_POST, {
+		"username": lower_name,
+		"last_login_time": current_time,
+		"active_days_streak": s["active_days_streak"],
+		"badges": badges
+	})
 
 
 func increment_matches_played(username: String) -> void:
@@ -461,21 +454,21 @@ func increment_matches_played(username: String) -> void:
 	var s = get_user_stats(username)
 	s["matches_played"] += 1
 	_stats[lower_name] = s
-	_save_stats()
+	_make_api_call("/stats/update", HTTPClient.METHOD_POST, {"username": lower_name, "matches_played_delta": 1})
 
 func increment_wins(username: String) -> void:
 	var lower_name = username.to_lower()
 	var s = get_user_stats(username)
 	s["wins"] += 1
 	_stats[lower_name] = s
-	_save_stats()
+	_make_api_call("/stats/update", HTTPClient.METHOD_POST, {"username": lower_name, "wins_delta": 1})
 
 func add_user_momos(username: String, amount: int) -> void:
 	var lower_name = username.to_lower()
 	var s = get_user_stats(username)
 	s["momos"] += amount
 	_stats[lower_name] = s
-	_save_stats()
+	_make_api_call("/stats/update", HTTPClient.METHOD_POST, {"username": lower_name, "momos_delta": amount})
 
 func spend_momos(amount: int) -> bool:
 	if not _is_logged_in:
@@ -485,41 +478,11 @@ func spend_momos(amount: int) -> bool:
 	if s["momos"] >= amount:
 		s["momos"] -= amount
 		_stats[lower_name] = s
-		_save_stats()
+		_make_api_call("/stats/update", HTTPClient.METHOD_POST, {"username": lower_name, "momos_delta": -amount})
 		return true
 	return false
 
-func _save_stats() -> bool:
-	var file := FileAccess.open_encrypted_with_pass("user://yeti_ral_stats.enc", FileAccess.WRITE, DB_PASS)
-	if file == null:
-		return false
-	file.store_string(JSON.stringify(_stats))
-	file.close()
-	return true
-
-func _load_stats() -> void:
-	if not FileAccess.file_exists("user://yeti_ral_stats.enc"):
-		_stats = {}
-		return
-	var file := FileAccess.open_encrypted_with_pass("user://yeti_ral_stats.enc", FileAccess.READ, DB_PASS)
-	if file == null:
-		_stats = {}
-		return
-	var raw: String = file.get_as_text()
-	file.close()
-	if raw.is_empty():
-		_stats = {}
-		return
-	var parsed = JSON.parse_string(raw)
-	if parsed is Dictionary:
-		_stats = parsed
-		# Migrate old stats keys to ensure match_history exists
-		for k in _stats.keys():
-			if typeof(_stats[k]) == TYPE_DICTIONARY:
-				if not _stats[k].has("match_history"):
-					_stats[k]["match_history"] = []
-	else:
-		_stats = {}
+# _save_stats and _load_stats removed — all stats are now stored on the backend server.
 
 # ─────────────────────────────────────────────────────────────────────────────
 # NEW SYSTEMS — COSMETICS, MATCH HISTORY, TITLES & LOCAL LEADERBOARD
@@ -527,38 +490,29 @@ func _load_stats() -> void:
 func equip_hat(hat_id: String) -> void:
 	if not _is_logged_in:
 		return
-	var valid_hats = ["dhaka_topi", "everest_crown", "sherpa_cap", "yak_horns", "kukri_band", "none"]
-	if not hat_id in valid_hats:
-		return
-		
-	_load_database()
 	var lower_key = _current_user.to_lower()
-	var user_data = _users.get(lower_key)
-	if user_data and typeof(user_data) == TYPE_DICTIONARY:
-		var owned: Array = user_data.get("owned_hats", [])
-		if hat_id == "none" or hat_id in owned:
-			user_data["equipped_hat"] = hat_id
-			_save_database()
+	# Update local cache for immediate display
+	_load_database()
+	var user_data = _users.get(lower_key, {})
+	user_data["equipped_hat"] = hat_id
+	_users[lower_key] = user_data
+	# Persist to server
+	_make_api_call("/user/equip_hat", HTTPClient.METHOD_POST, {"username": lower_key, "hat_id": hat_id})
 
 func unlock_hat(hat_id: String) -> void:
 	if not _is_logged_in:
 		return
-	var valid_hats = [
-		"dhaka_topi", "everest_crown", "sherpa_cap", "yak_horns", "kukri_band", "none",
-		"mountain_glasses", "apple", "banana", "cherry", "grape", "kiwi"
-	]
-	if not hat_id in valid_hats:
-		return
-		
-	_load_database()
 	var lower_key = _current_user.to_lower()
-	var user_data = _users.get(lower_key)
-	if user_data and typeof(user_data) == TYPE_DICTIONARY:
-		var owned: Array = user_data.get("owned_hats", [])
-		if not hat_id in owned:
-			owned.append(hat_id)
-			user_data["owned_hats"] = owned
-			_save_database()
+	# Update local cache
+	_load_database()
+	var user_data = _users.get(lower_key, {})
+	var owned: Array = user_data.get("owned_hats", [])
+	if not hat_id in owned:
+		owned.append(hat_id)
+	user_data["owned_hats"] = owned
+	_users[lower_key] = user_data
+	# Persist to server
+	_make_api_call("/user/unlock_hat", HTTPClient.METHOD_POST, {"username": lower_key, "hat_id": hat_id})
 
 func get_owned_items() -> Array:
 	if not _is_logged_in:
@@ -615,16 +569,16 @@ func set_player_color(hex_color: String) -> void:
 	var user_data = _users.get(lower_key)
 	if user_data and typeof(user_data) == TYPE_DICTIONARY:
 		user_data["equipped_color"] = hex_color
-		_save_database()
+		_make_api_call("/user/update_color", HTTPClient.METHOD_POST, {"username": lower_key, "color": hex_color})
 
 func log_match_result(mode: String, rounds_won: int, position: int, momos: int) -> void:
 	if not _is_logged_in:
 		return
-		
+
 	var lower_name = _current_user.to_lower()
 	var s = get_user_stats(_current_user)
 	var history: Array = s.get("match_history", [])
-	
+
 	var entry = {
 		"date": int(Time.get_unix_time_from_system()),
 		"mode": mode,
@@ -632,15 +586,18 @@ func log_match_result(mode: String, rounds_won: int, position: int, momos: int) 
 		"position": position,
 		"momos_earned": momos
 	}
-	
+
 	history.append(entry)
-	
 	while history.size() > 20:
 		history.remove_at(0)
-		
 	s["match_history"] = history
 	_stats[lower_name] = s
-	_save_stats()
+
+	# Send match entry to server
+	_make_api_call("/stats/update", HTTPClient.METHOD_POST, {
+		"username": lower_name,
+		"match_history_entry": entry
+	})
 
 func get_player_title(username: String = _current_user) -> String:
 	var s = get_user_stats(username)

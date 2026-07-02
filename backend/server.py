@@ -85,15 +85,84 @@ def get_stats(username):
 def update_stats():
     data = request.json
     username = data.get('username', '').lower()
-    
     stats = load_json(STATS_PATH)
-    if username in stats:
-        if 'xp' in data: stats[username]['xp'] += data['xp']
-        if 'momos' in data: stats[username]['momos'] += data['momos']
-        if 'level' in data: stats[username]['level'] = data['level']
-        save_json(STATS_PATH, stats)
-        return jsonify({"success": True})
-    return jsonify({"success": False})
+    if username not in stats:
+        stats[username] = {
+            "matches_played": 0, "wins": 0, "momos": 0, "xp": 0, "level": 1,
+            "last_login_time": 0.0, "active_days_streak": 0, "badges": [], "match_history": []
+        }
+    if 'xp' in data: stats[username]['xp'] += data['xp']
+    if 'momos_delta' in data: stats[username]['momos'] += data['momos_delta']
+    if 'level' in data: stats[username]['level'] = data['level']
+    if 'matches_played_delta' in data: stats[username]['matches_played'] += data['matches_played_delta']
+    if 'wins_delta' in data: stats[username]['wins'] += data['wins_delta']
+    if 'last_login_time' in data: stats[username]['last_login_time'] = data['last_login_time']
+    if 'active_days_streak' in data: stats[username]['active_days_streak'] = data['active_days_streak']
+    if 'badges' in data: stats[username]['badges'] = data['badges']
+    if 'match_history_entry' in data:
+        history = stats[username].get('match_history', [])
+        history.append(data['match_history_entry'])
+        while len(history) > 20:
+            history.pop(0)
+        stats[username]['match_history'] = history
+    save_json(STATS_PATH, stats)
+    return jsonify({"success": True, "stats": stats[username]})
+
+@app.route('/stats/sync', methods=['POST'])
+def sync_stats():
+    """Full stats write — overwrites the record with client-provided values."""
+    data = request.json
+    username = data.get('username', '').lower()
+    stats = load_json(STATS_PATH)
+    if username not in stats:
+        stats[username] = {}
+    for key in ['momos', 'xp', 'level', 'matches_played', 'wins',
+                 'last_login_time', 'active_days_streak', 'badges', 'match_history']:
+        if key in data:
+            stats[username][key] = data[key]
+    save_json(STATS_PATH, stats)
+    return jsonify({"success": True, "stats": stats[username]})
+
+@app.route('/user/equip_hat', methods=['POST'])
+def equip_hat():
+    data = request.json
+    username = data.get('username', '').lower()
+    hat_id = data.get('hat_id', 'none')
+    db = load_json(DB_PATH)
+    if username not in db:
+        return jsonify({"success": False, "message": "User not found."})
+    owned = db[username].get('owned_hats', [])
+    if hat_id != 'none' and hat_id not in owned:
+        return jsonify({"success": False, "message": "Hat not owned."})
+    db[username]['equipped_hat'] = hat_id
+    save_json(DB_PATH, db)
+    return jsonify({"success": True})
+
+@app.route('/user/unlock_hat', methods=['POST'])
+def unlock_hat():
+    data = request.json
+    username = data.get('username', '').lower()
+    hat_id = data.get('hat_id', '')
+    db = load_json(DB_PATH)
+    if username not in db:
+        return jsonify({"success": False, "message": "User not found."})
+    owned = db[username].setdefault('owned_hats', [])
+    if hat_id not in owned:
+        owned.append(hat_id)
+    save_json(DB_PATH, db)
+    return jsonify({"success": True, "owned_hats": owned})
+
+@app.route('/user/update_color', methods=['POST'])
+def update_color():
+    data = request.json
+    username = data.get('username', '').lower()
+    color = data.get('color', '#FFFFFF')
+    db = load_json(DB_PATH)
+    if username not in db:
+        return jsonify({"success": False, "message": "User not found."})
+    db[username]['equipped_color'] = color
+    save_json(DB_PATH, db)
+    return jsonify({"success": True})
 
 @app.route('/user/get_by_uid/<uid>', methods=['GET'])
 def get_user_by_uid(uid):
