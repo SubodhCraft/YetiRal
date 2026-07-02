@@ -41,6 +41,11 @@ var _kill_count: Dictionary = {}
 ## Set of peer_ids already promoted to spectator this round.
 var _spectators: Dictionary = {}
 
+## ─── MP READY-GATE: synchronized round start ──────────────────────────────────
+## Counts how many players have tapped "LET'S GO!" on the intro card.
+## Once all players are ready the HOST broadcasts the simultaneous start.
+var _mp_ready_count: int = 0
+
 const HUD_SCENE: String = "res://scenes/ui/GameplayHUD.tscn"
 const PLAYER_SCENE: String = "res://scenes/gameplay/Player3D.tscn"
 const MOMO_COIN_SCENE: String = "res://scenes/gameplay/MomoCoin.tscn"
@@ -281,8 +286,8 @@ func _on_finish_zone_body_entered(body: Node3D) -> void:
 				body.set_process_input(false)
 				Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 				GameManager.rpc_id(1, "submit_finish", multiplayer.get_unique_id())
-				if hud and hud.has_method("show_finished_message"):
-					hud.show_finished_message()
+				# Show QUALIFIED! banner for 2 seconds before the waiting panel
+				_show_qualified_banner()
 				# Activate spectator-style camera so the waiting player can watch
 				_activate_finish_spectator_camera(body as CharacterBody3D)
 		else:
@@ -739,10 +744,88 @@ func _show_round_info_card() -> void:
 	btn.pressed.connect(func() -> void:
 		bg.queue_free()
 		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
-		if hud and hud.has_method("fade_from_black"):
-			hud.fade_from_black(0.6)
-		_begin_intro_countdown()
+		if GameManager.is_multiplayer and multiplayer.has_multiplayer_peer():
+			# In MP: notify the host that this player is ready.
+			# The host waits for ALL players before starting the shared countdown.
+			rpc_id(1, "_on_player_ready_rpc")
+		else:
+			# Singleplayer: start immediately
+			if hud and hud.has_method("fade_from_black"):
+				hud.fade_from_black(0.6)
+			_begin_intro_countdown()
 	)
+
+## Shows a full-screen "QUALIFIED!" overlay for 2 seconds, then shows the
+## waiting-panel so the player knows others are still playing.
+func _show_qualified_banner() -> void:
+	if not hud:
+		return
+	
+	var overlay = ColorRect.new()
+	overlay.name = "QualifiedOverlay"
+	overlay.color = Color(0.0, 0.0, 0.0, 0.0)
+	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
+	overlay.z_index = 200
+	hud.add_child(overlay)
+	
+	var vbox = VBoxContainer.new()
+	vbox.set_anchors_preset(Control.PRESET_CENTER)
+	vbox.alignment = BoxContainer.ALIGNMENT_CENTER
+	overlay.add_child(vbox)
+	
+	var qlabel = Label.new()
+	qlabel.text = "✅ QUALIFIED!"
+	qlabel.add_theme_font_size_override("font_size", 72)
+	qlabel.add_theme_color_override("font_color", Color(0.2, 1.0, 0.3))
+	qlabel.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	vbox.add_child(qlabel)
+	
+	var pos_label = Label.new()
+	if GameManager.is_multiplayer:
+		var pos = GameManager.round_finishes.find(multiplayer.get_unique_id()) + 1
+		pos_label.text = "Position: #%d" % max(1, pos)
+	pos_label.add_theme_font_size_override("font_size", 36)
+	pos_label.add_theme_color_override("font_color", Color(1.0, 0.84, 0.0))
+	pos_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	vbox.add_child(pos_label)
+	
+	# Animate in with fade + scale bounce
+	var tw = overlay.create_tween().set_parallel(true).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	tw.tween_property(overlay, "color", Color(0.0, 0.0, 0.0, 0.75), 0.3)
+	tw.tween_property(qlabel, "scale", Vector2(1.0, 1.0), 0.4).from(Vector2(0.3, 0.3))
+	
+	# After 2.2 seconds: fade out, then show the normal waiting panel
+	await get_tree().create_timer(2.2).timeout
+	
+	var tw2 = overlay.create_tween()
+	tw2.tween_property(overlay, "color", Color(0.0, 0.0, 0.0, 0.0), 0.4)
+	await tw2.finished
+	
+	if is_instance_valid(overlay):
+		overlay.queue_free()
+	# Show the regular "waiting for others" panel
+	if hud and hud.has_method("show_finished_message"):
+		hud.show_finished_message()
+
+## Called ON THE HOST via RPC when a remote player taps "LET'S GO!".
+## Once all players are ready, broadcasts the simultaneous countdown start.
+@rpc("any_peer", "call_local", "reliable")
+func _on_player_ready_rpc() -> void:
+	if not multiplayer.is_server():
+		return
+	_mp_ready_count += 1
+	var total_players = NetworkManager.players.size() if NetworkManager else 1
+	if _mp_ready_count >= total_players:
+		_mp_ready_count = 0
+		rpc("_notify_all_start_round")
+
+## Broadcast from host to every client: begin the intro countdown NOW.
+## This ensures all players start the round timer at the exact same moment.
+@rpc("authority", "call_local", "reliable")
+func _notify_all_start_round() -> void:
+	if hud and hud.has_method("fade_from_black"):
+		hud.fade_from_black(0.6)
+	_begin_intro_countdown()
 
 func _get_round_objective() -> String:
 	var name_lower = round_name.to_lower()

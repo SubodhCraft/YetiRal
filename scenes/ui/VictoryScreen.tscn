@@ -3,7 +3,23 @@
 [ext_resource type="Script" path="res://scripts/VictoryScreen.gd" id="1_victory"]
 
 [sub_resource type="StyleBoxFlat" id="SB_BG"]
-bg_color = Color(0.08, 0.07, 0.02, 1.0)
+bg_color = Color(0.06, 0.05, 0.01, 1.0)
+
+[sub_resource type="StyleBoxFlat" id="SB_Card"]
+bg_color = Color(0.10, 0.09, 0.04, 0.97)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.72, 0.52, 0.04, 1.0)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+content_margin_left = 40
+content_margin_right = 40
+content_margin_top = 30
+content_margin_bottom = 30
 
 [sub_resource type="StyleBoxFlat" id="SB_BtnLobby"]
 bg_color = Color(0.72, 0.52, 0.04, 1.0)
@@ -12,22 +28,22 @@ border_width_top = 2
 border_width_right = 2
 border_width_bottom = 2
 border_color = Color(0.95, 0.78, 0.25, 1.0)
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_right = 8
-corner_radius_bottom_left = 8
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
 
-[sub_resource type="StyleBoxFlat" id="SB_BtnLobbyHover"]
+[sub_resource type="StyleBoxFlat" id="SB_BtnHover"]
 bg_color = Color(0.85, 0.65, 0.05, 1.0)
 border_width_left = 2
 border_width_top = 2
 border_width_right = 2
 border_width_bottom = 2
 border_color = Color(1.0, 0.9, 0.4, 1.0)
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_right = 8
-corner_radius_bottom_left = 8
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
 
 [node name="VictoryScreen" type="Control"]
 layout_mode = 3
@@ -55,36 +71,71 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="VBox" type="VBoxContainer" parent="CenterContainer"]
+[node name="OuterCard" type="PanelContainer" parent="CenterContainer"]
 layout_mode = 2
-theme_override_constants/separation = 40
-alignment = 1
+custom_minimum_size = Vector2(600, 0)
+theme_override_styles/panel = SubResource("SB_Card")
 
-[node name="Title" type="Label" parent="CenterContainer/VBox"]
+[node name="InnerVBox" type="VBoxContainer" parent="CenterContainer/OuterCard"]
+layout_mode = 2
+theme_override_constants/separation = 18
+
+[node name="Title" type="Label" parent="CenterContainer/OuterCard/InnerVBox"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.95, 0.78, 0.25, 1.0)
-theme_override_font_sizes/font_size = 80
+theme_override_font_sizes/font_size = 72
 text = "VICTORY!"
 horizontal_alignment = 1
 
-[node name="MomosCollectedLabel" type="Label" parent="CenterContainer/VBox"]
+[node name="WinLabel" type="Label" parent="CenterContainer/OuterCard/InnerVBox"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 28
-text = "🥟 FINAL MOMOS COLLECTED: 0"
+theme_override_font_sizes/font_size = 26
+text = ""
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="RewardsLabel" type="Label" parent="CenterContainer/OuterCard/InnerVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Rewards: ..."
 horizontal_alignment = 1
 
-[node name="HBoxButtons" type="HBoxContainer" parent="CenterContainer/VBox"]
+[node name="HSep" type="HSeparator" parent="CenterContainer/OuterCard/InnerVBox"]
 layout_mode = 2
-theme_override_constants/separation = 24
+
+[node name="StandingsLabel" type="Label" parent="CenterContainer/OuterCard/InnerVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.78, 0.25, 1.0)
+theme_override_font_sizes/font_size = 17
+text = "-- FINAL STANDINGS --"
+horizontal_alignment = 1
+
+[node name="ScrollContainer" type="ScrollContainer" parent="CenterContainer/OuterCard/InnerVBox"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 160)
+
+[node name="LeaderboardVBox" type="VBoxContainer" parent="CenterContainer/OuterCard/InnerVBox/ScrollContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="HSep2" type="HSeparator" parent="CenterContainer/OuterCard/InnerVBox"]
+layout_mode = 2
+
+[node name="ButtonsHBox" type="HBoxContainer" parent="CenterContainer/OuterCard/InnerVBox"]
+layout_mode = 2
+theme_override_constants/separation = 20
 alignment = 1
 
-[node name="LobbyBtn" type="Button" parent="CenterContainer/VBox/HBoxButtons"]
+[node name="LobbyBtn" type="Button" parent="CenterContainer/OuterCard/InnerVBox/ButtonsHBox"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(250, 60)
+custom_minimum_size = Vector2(260, 60)
 layout_mode = 2
 theme_override_font_sizes/font_size = 20
 theme_override_styles/normal = SubResource("SB_BtnLobby")
-theme_override_styles/hover = SubResource("SB_BtnLobbyHover")
-theme_override_styles/pressed = SubResource("SB_BtnLobbyHover")
+theme_override_styles/hover = SubResource("SB_BtnHover")
+theme_override_styles/pressed = SubResource("SB_BtnHover")
 text = "RETURN TO LOBBY"

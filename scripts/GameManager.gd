@@ -162,11 +162,11 @@ func start_multiplayer_game() -> void:
 		player_momos[pid] = 0
 
 	# Only the HOST generates and distributes the map order
+	# Rounds play in fixed sequential order: Round 1 → Round 2 → ... → Round 8
 	if multiplayer.is_server():
-		var shuffled = ROUNDS.duplicate()
-		shuffled.shuffle()
+		var ordered = ROUNDS.duplicate()
 		# Use string array for RPC compatibility
-		rpc("sync_round_list", shuffled)
+		rpc("sync_round_list", ordered)
 
 func _load_mp_round() -> void:
 	round_finishes.clear()

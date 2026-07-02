@@ -118,11 +118,13 @@ func _ready() -> void:
 		if not is_multiplayer_authority():
 			if has_node("SpringArm3D"):
 				$SpringArm3D.queue_free()
-			# Disable processing for other players' nodes locally
-			set_process(false)
+			# Disable physics and input for remote players, but keep process()
+			# enabled so the MultiplayerSynchronizer can apply position updates
+			# every frame — without this the character appears frozen in spectator.
 			set_physics_process(false)
 			set_process_unhandled_input(false)
 			set_process_input(false)
+			# set_process(false) intentionally omitted — needed for network sync
 			return
 			
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
