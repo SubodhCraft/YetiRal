@@ -918,7 +918,11 @@ func _setup_daily_reward_modal() -> void:
 		if current_day > last_claim:
 			stats["last_daily_claim_day"] = current_day
 			SessionManager._stats[username.to_lower()] = stats
-			SessionManager._save_stats()
+			# Persist daily claim day to server
+			SessionManager._make_api_call("/stats/sync", HTTPClient.METHOD_POST, {
+				"username": username.to_lower(),
+				"last_daily_claim_day": current_day
+			})
 			daily_reward_modal.visible = true
 
 func _setup_store_success_modal() -> void:
