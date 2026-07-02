@@ -42,8 +42,7 @@ var backend_ip: String = "127.0.0.1"
 # LIFECYCLE
 # ─────────────────────────────────────────────────────────────────────────────
 func _ready() -> void:
-	_load_database()
-
+	pass
 
 # ─────────────────────────────────────────────────────────────────────────────
 # PUBLIC — SESSION QUERIES
@@ -131,17 +130,15 @@ func login_user(username: String, password: String) -> Dictionary:
 		var profile_res = await _make_api_call("/user/profile/" + username, HTTPClient.METHOD_GET)
 		if profile_res.get("success", false):
 			var lower_key = username.to_lower()
-			_load_database()
 			if not _users.has(lower_key):
 				_users[lower_key] = {}
-			_users[lower_key]["profile_pic_path"] = profile_res.get("profile_pic_path", "")
+			_users[lower_key]["profile_pic_b64"] = profile_res.get("profile_pic_b64", "")
 			if profile_res.has("equipped_hat"):
 				_users[lower_key]["equipped_hat"] = profile_res.get("equipped_hat", "none")
 			if profile_res.has("equipped_color"):
 				_users[lower_key]["equipped_color"] = profile_res.get("equipped_color", "#FFFFFF")
 			if profile_res.has("owned_hats"):
 				_users[lower_key]["owned_hats"] = profile_res.get("owned_hats", [])
-			_save_database()
 		
 		await fetch_friends_async()
 		emit_signal("session_started", _current_user)
@@ -231,80 +228,8 @@ func _is_valid_username(username: String) -> bool:
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# PRIVATE — ENCRYPTED DATABASE I/O
+# PRIVATE — ENCRYPTED DATABASE I/O (Removed, logic moved to Python server)
 # ─────────────────────────────────────────────────────────────────────────────
-## Saves the in-memory _users dictionary to the encrypted file.
-func _save_database() -> bool:
-	# Ensure user data dir exists
-	var dir = DirAccess.open("user://")
-	if dir == null:
-		DirAccess.make_dir_absolute(OS.get_user_data_dir())
-	
-	# Validate DB_PASS is pure ASCII before use
-	assert(DB_PASS.length() == DB_PASS.to_utf8_buffer().size(), "DB_PASS must be ASCII only")
-	
-	var file := FileAccess.open_encrypted_with_pass(DB_PATH, FileAccess.WRITE, DB_PASS)
-	if file == null:
-		push_error("DB write failed: %s" % error_string(FileAccess.get_open_error()))
-		return false
-
-	file.store_string(JSON.stringify(_users, "\t"))
-	file.close()
-	return true
-
-
-## Loads the encrypted user database from disk into _users.
-func _load_database() -> void:
-	# Validate DB_PASS is pure ASCII before use
-	assert(DB_PASS.length() == DB_PASS.to_utf8_buffer().size(), "DB_PASS must be ASCII only")
-	
-	if not FileAccess.file_exists(DB_PATH):
-		# First run — start with an empty database
-		_users = {}
-		return
-
-	var file := FileAccess.open_encrypted_with_pass(DB_PATH, FileAccess.READ, DB_PASS)
-	if file == null:
-		push_error("DB read failed: %s" % error_string(FileAccess.get_open_error()))
-		_users = {}
-		return
-
-	var raw: String = file.get_as_text()
-	file.close()
-
-	if raw.is_empty():
-		_users = {}
-		return
-
-	var parsed = JSON.parse_string(raw)
-	if parsed == null or not (parsed is Dictionary):
-		push_error("SessionManager: Database corrupted or unreadable.")
-		_users = {}
-		return
-
-	# Migrate old string-based user data to dictionaries and ensure cosmetics keys exist
-	for k in parsed.keys():
-		if typeof(parsed[k]) == TYPE_STRING:
-			parsed[k] = {
-				"hash": parsed[k],
-				"uid": _generate_uid_for(k),
-				"friends": [],
-				"requests": [],
-				"equipped_hat": "none",
-				"equipped_color": "#FFFFFF",
-				"owned_hats": []
-			}
-		elif typeof(parsed[k]) == TYPE_DICTIONARY:
-			if not parsed[k].has("equipped_hat"):
-				parsed[k]["equipped_hat"] = "none"
-			if not parsed[k].has("equipped_color"):
-				parsed[k]["equipped_color"] = "#FFFFFF"
-			if not parsed[k].has("owned_hats"):
-				parsed[k]["owned_hats"] = []
-			if not parsed[k].has("profile_pic_path"):
-				parsed[k]["profile_pic_path"] = ""
-
-	_users = parsed
 
 # ─────────────────────────────────────────────────────────────────────────────
 # PUBLIC — FRIENDS & UID
@@ -493,7 +418,6 @@ func equip_hat(hat_id: String) -> void:
 		return
 	var lower_key = _current_user.to_lower()
 	# Update local cache for immediate display
-	_load_database()
 	var user_data = _users.get(lower_key, {})
 	user_data["equipped_hat"] = hat_id
 	_users[lower_key] = user_data
@@ -505,7 +429,6 @@ func unlock_hat(hat_id: String) -> void:
 		return
 	var lower_key = _current_user.to_lower()
 	# Update local cache
-	_load_database()
 	var user_data = _users.get(lower_key, {})
 	var owned: Array = user_data.get("owned_hats", [])
 	if not hat_id in owned:
@@ -518,7 +441,6 @@ func unlock_hat(hat_id: String) -> void:
 func get_owned_items() -> Array:
 	if not _is_logged_in:
 		return []
-	_load_database()
 	var lower_key = _current_user.to_lower()
 	var user_data = _users.get(lower_key)
 	if user_data and typeof(user_data) == TYPE_DICTIONARY:
@@ -543,7 +465,6 @@ func change_password(old_password: String, new_password: String) -> Dictionary:
 		return {"ok": false, "msg": res.get("message", "Password change failed.")}
 
 func get_equipped_hat(username: String = _current_user) -> String:
-	_load_database()
 	var lower_key = username.to_lower()
 	var user_data = _users.get(lower_key)
 	if user_data and typeof(user_data) == TYPE_DICTIONARY:
@@ -551,7 +472,6 @@ func get_equipped_hat(username: String = _current_user) -> String:
 	return "none"
 
 func get_player_color(username: String = _current_user) -> Color:
-	_load_database()
 	var lower_key = username.to_lower()
 	var user_data = _users.get(lower_key)
 	if user_data and typeof(user_data) == TYPE_DICTIONARY:
@@ -565,7 +485,6 @@ func set_player_color(hex_color: String) -> void:
 		return
 	if not Color.html_is_valid(hex_color):
 		return
-	_load_database()
 	var lower_key = _current_user.to_lower()
 	var user_data = _users.get(lower_key)
 	if user_data and typeof(user_data) == TYPE_DICTIONARY:
@@ -642,8 +561,6 @@ func update_username(new_username: String) -> Dictionary:
 	if not _is_valid_username(new_username):
 		result["message"] = "Username must be 4–24 alphanumeric characters."
 		return result
-		
-	_load_database()
 	var lower_new = new_username.to_lower()
 	var lower_old = _current_user.to_lower()
 	
@@ -660,7 +577,6 @@ func update_username(new_username: String) -> Dictionary:
 	var user_data = _users[lower_old].duplicate(true)
 	_users[lower_new] = user_data
 	_users.erase(lower_old)
-	_save_database()
 	
 	# Stats migration is server-side; the server retains the old username's stats
 	# until a dedicated rename endpoint is added.
@@ -669,21 +585,17 @@ func update_username(new_username: String) -> Dictionary:
 	result["message"] = "Username updated successfully."
 	return result
 
-func set_profile_pic_path(path: String) -> void:
+func set_profile_pic_b64(b64_string: String) -> void:
 	if not _is_logged_in: return
-	_load_database()
 	var lower_key = _current_user.to_lower()
 	if _users.has(lower_key):
-		_users[lower_key]["profile_pic_path"] = path
-		_save_database()
-	# Also push to Flask backend so it persists across logins
-	if APIManager:
-		var payload = {"username": _current_user, "profile_pic_path": path}
-		_make_api_call("/user/set_profile_pic", HTTPClient.METHOD_POST, payload)
+		_users[lower_key]["profile_pic_b64"] = b64_string
+	# Push base64 string to Flask backend
+	var payload = {"username": _current_user, "profile_pic_b64": b64_string}
+	_make_api_call("/user/set_profile_pic", HTTPClient.METHOD_POST, payload)
 
-func get_profile_pic_path(username: String = _current_user) -> String:
-	_load_database()
+func get_profile_pic_b64(username: String = _current_user) -> String:
 	var lower_key = username.to_lower()
-	if _users.has(lower_key) and _users[lower_key].has("profile_pic_path"):
-		return _users[lower_key]["profile_pic_path"]
+	if _users.has(lower_key) and _users[lower_key].has("profile_pic_b64"):
+		return _users[lower_key]["profile_pic_b64"]
 	return ""

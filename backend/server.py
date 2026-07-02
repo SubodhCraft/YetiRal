@@ -181,7 +181,7 @@ def get_user_profile(username):
     user = db[lower]
     return jsonify({
         "success": True,
-        "profile_pic_path": user.get("profile_pic_path", ""),
+        "profile_pic_b64": user.get("profile_pic_b64", ""),
         "equipped_hat": user.get("equipped_hat", "none"),
         "equipped_color": user.get("equipped_color", "#FFFFFF"),
         "owned_hats": user.get("owned_hats", [])
@@ -191,11 +191,11 @@ def get_user_profile(username):
 def set_profile_pic():
     data = request.json
     username = data.get('username', '').lower()
-    path = data.get('profile_pic_path', '')
+    b64_data = data.get('profile_pic_b64', '')
     db = load_json(DB_PATH)
     if username not in db:
         return jsonify({"success": False, "message": "User not found."})
-    db[username]['profile_pic_path'] = path
+    db[username]['profile_pic_b64'] = b64_data
     save_json(DB_PATH, db)
     return jsonify({"success": True})
     

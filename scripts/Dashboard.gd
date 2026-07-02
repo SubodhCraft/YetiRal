@@ -302,10 +302,11 @@ func _populate_profile_view() -> void:
 		if xp_text_label:
 			xp_text_label.text = "%d out of %d XP" % [xp, needed]
 		
-	var pic_path = SessionManager.get_profile_pic_path(username)
-	if pic_path != "" and profile_avatar:
-		var img = Image.load_from_file(pic_path)
-		if img:
+	var b64 = SessionManager.get_profile_pic_b64(username)
+	if b64 != "" and profile_avatar:
+		var buffer = Marshalls.base64_to_raw(b64)
+		var img = Image.new()
+		if img.load_png_from_buffer(buffer) == OK:
 			profile_avatar.texture = ImageTexture.create_from_image(img)
 			
 	# Update vault
@@ -742,11 +743,12 @@ func _on_upload_pic_pressed() -> void:
 func _on_file_selected(path: String) -> void:
 	var img = Image.load_from_file(path)
 	if img:
-		var tex = ImageTexture.create_from_image(img)
+		# Resize to a reasonable avatar size to keep base64 string small
+		img.resize(256, 256)
+		var buffer = img.save_png_to_buffer()
+		var b64 = Marshalls.raw_to_base64(buffer)
 		var user_name = SessionManager.get_current_user()
-		var save_path = "user://profile_pic_" + user_name + ".png"
-		img.save_png(save_path)
-		SessionManager.set_profile_pic_path(save_path)
+		SessionManager.set_profile_pic_b64(b64)
 		_update_avatars(user_name)
 			
 func _on_update_username_pressed() -> void:
@@ -828,20 +830,15 @@ func _update_avatars(username: String) -> void:
 		if avatar_node and avatar_node.get_parent() and avatar_node.get_parent().has_node("InitialLabel"):
 			avatar_node.get_parent().get_node("InitialLabel").text = initial
 	
-	var pic_path = SessionManager.get_profile_pic_path(username)
+	var b64 = SessionManager.get_profile_pic_b64(username)
 	
-	# Also try loading from user:// directly if path is relative
 	var img: Image = null
-	if pic_path != "":
+	if b64 != "":
+		var buffer = Marshalls.base64_to_raw(b64)
 		img = Image.new()
-		var err = img.load(pic_path)
-		if err != OK:
-			# Try the standard user:// path as fallback
-			var fallback_path = "user://profile_pic_" + username.to_lower() + ".png"
-			var err2 = img.load(fallback_path)
-			if err2 != OK:
-				img = null
-	
+		if img.load_png_from_buffer(buffer) != OK:
+			img = null
+			
 	if img:
 		var tex = ImageTexture.create_from_image(img)
 		# Show photo, hide initial letter
