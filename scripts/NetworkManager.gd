@@ -144,14 +144,6 @@ func start_match() -> void:
 			join_failed.emit("Need at least 2 players to start")
 			return
 			
-		var all_ready = true
-		for p_id in players:
-			if not player_ready.get(p_id, false):
-				all_ready = false
-				break
-		if not all_ready:
-			return
-			
 		rpc("start_match_rpc")
 
 func _get_local_ip() -> String:

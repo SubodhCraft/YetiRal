@@ -136,6 +136,7 @@ func _ready() -> void:
 		NetworkManager.room_created.connect(_on_room_created)
 		NetworkManager.join_failed.connect(_on_join_failed)
 		NetworkManager.player_list_changed.connect(_refresh_lobby_player_list)
+		NetworkManager.game_started.connect(_on_game_started)
 		multiplayer.connected_to_server.connect(_on_connected_to_server)
 		
 	if SessionManager:
@@ -230,6 +231,10 @@ func _on_room_created(code: String) -> void:
 	if room_code_display: room_code_display.text = "Code: %s" % code
 	_refresh_lobby_player_list()
 
+func _on_game_started() -> void:
+	if GameManager:
+		GameManager.start_multiplayer_game()
+
 func _on_connected_to_server() -> void:
 	_set_modal_state("waiting")
 	if room_code_display: room_code_display.text = "Code: %s" % NetworkManager.room_code
@@ -249,8 +254,7 @@ func _refresh_lobby_player_list() -> void:
 	for pid in NetworkManager.players:
 		var pdata = NetworkManager.players[pid]
 		var lbl = Label.new()
-		var ready_icon = "✅" if NetworkManager.player_ready.get(pid, false) else "⏳"
-		lbl.text = "%s %s" % [ready_icon, pdata.get("username", "Player")]
+		lbl.text = "👤 %s" % pdata.get("username", "Player")
 		lbl.add_theme_font_size_override("font_size", 16)
 		lobby_players_list.add_child(lbl)
 	if start_match_btn:
