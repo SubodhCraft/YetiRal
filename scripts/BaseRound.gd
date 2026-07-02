@@ -202,7 +202,8 @@ func _update_hud_stats() -> void:
 		if GameManager.is_multiplayer and multiplayer.has_multiplayer_peer():
 			var my_id = multiplayer.get_unique_id()
 			var my_momos = GameManager.player_momos.get(my_id, 0)
-			hud.update_stats(99, my_momos)
+			var my_lives = GameManager.player_lives.get(my_id, 3)
+			hud.update_stats(my_lives, my_momos)
 		else:
 			hud.update_stats(GameManager.lives, GameManager.momos)
 
@@ -213,14 +214,19 @@ func _on_kill_zone_body_entered(body: Node3D) -> void:
 		if GameManager.is_multiplayer and multiplayer.has_multiplayer_peer():
 			if body.is_multiplayer_authority():
 				var pid: int = body.get_multiplayer_authority()
-
-				# ── Feature 4: track deaths → promote to spectator ────────────
-				_kill_count[pid] = _kill_count.get(pid, 0) + 1
-				if _kill_count[pid] >= spectator_kill_threshold and not _spectators.has(pid):
+				
+				# Tell the server to deduct a life — it will broadcast back to everyone
+				GameManager.rpc_id(1, "deduct_mp_life", pid)
+				
+				var current_lives = GameManager.player_lives.get(pid, 3) - 1
+				if current_lives <= 0:
+					# No lives left — become a spectator immediately
 					_make_spectator(body as CharacterBody3D, pid)
+					if hud and hud.has_method("show_eliminated_message"):
+						hud.show_eliminated_message()
 					return
-
-				# ── Feature 1 (MP): respawn at last checkpoint or spawn_point ──
+				
+				# Still has lives — respawn at last checkpoint or spawn point
 				var target: Marker3D = _player_checkpoints.get(body, spawn_point) as Marker3D
 				if not target:
 					target = spawn_point
@@ -286,6 +292,8 @@ func _on_finish_zone_body_entered(body: Node3D) -> void:
 				GameManager.rpc_id(1, "submit_finish", multiplayer.get_unique_id())
 				if hud and hud.has_method("show_finished_message"):
 					hud.show_finished_message()
+				# Activate spectator-style camera so the waiting player can watch
+				_activate_finish_spectator_camera(body as CharacterBody3D)
 		else:
 			# Singleplayer: advance to next round
 			if GameManager:
@@ -487,6 +495,39 @@ func force_sync_position(peer_id: int, pos: Vector3) -> void:
 
 func _find_player_by_peer_id(peer_id: int) -> Node:
 	return get_node_or_null(str(peer_id))
+
+## Activates a spectator-style overhead camera for a player who crossed the finish.
+## Unlike _make_spectator (elimination), the player's body stays visible.
+## The camera orbits/pans slowly so they can watch the remaining players.
+func _activate_finish_spectator_camera(body: CharacterBody3D) -> void:
+	var spec_cam := Camera3D.new()
+	spec_cam.name = "FinishSpectatorCamera"
+	# Position high above the finish area looking down
+	spec_cam.global_position = body.global_position + Vector3(0.0, 14.0, 10.0)
+	spec_cam.rotation_degrees = Vector3(-35.0, 180.0, 0.0)
+	get_tree().current_scene.add_child(spec_cam)
+	spec_cam.make_current()
+
+	# Gentle slow pan so the spectating player sees the whole level
+	var cam_ref: Camera3D = spec_cam
+	var move_speed: float = 5.0
+	get_tree().process_frame.connect(
+		func() -> void:
+			if not is_instance_valid(cam_ref) or not cam_ref.is_current():
+				return
+			var d: float = get_process_delta_time()
+			var move: Vector3 = Vector3.ZERO
+			if Input.is_key_pressed(KEY_W): move -= cam_ref.global_transform.basis.z
+			if Input.is_key_pressed(KEY_S): move += cam_ref.global_transform.basis.z
+			if Input.is_key_pressed(KEY_A): move -= cam_ref.global_transform.basis.x
+			if Input.is_key_pressed(KEY_D): move += cam_ref.global_transform.basis.x
+			if Input.is_key_pressed(KEY_Q): move -= Vector3.UP
+			if Input.is_key_pressed(KEY_E): move += Vector3.UP
+			if move != Vector3.ZERO:
+				cam_ref.global_position += move.normalized() * move_speed * d
+	)
+
+
 
 ## Shows the Yeti fact card for this round, then calls callback.
 ## Works in both SP and MP (fact always shown locally).

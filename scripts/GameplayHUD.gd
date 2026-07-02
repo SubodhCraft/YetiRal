@@ -196,6 +196,54 @@ func show_finished_message() -> void:
 	panel.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
 	add_child(panel)
 
+func show_eliminated_message() -> void:
+	if has_node("EliminatedPanel"):
+		return
+	
+	var panel = PanelContainer.new()
+	panel.name = "EliminatedPanel"
+	
+	var style = StyleBoxFlat.new()
+	style.bg_color = Color(0.6, 0.1, 0.1, 0.9)
+	style.corner_radius_top_left = 16
+	style.corner_radius_top_right = 16
+	style.corner_radius_bottom_right = 16
+	style.corner_radius_bottom_left = 16
+	style.content_margin_left = 40
+	style.content_margin_right = 40
+	style.content_margin_top = 25
+	style.content_margin_bottom = 25
+	style.border_width_left = 2
+	style.border_width_top = 2
+	style.border_width_right = 2
+	style.border_width_bottom = 2
+	style.border_color = Color(1.0, 0.3, 0.3, 0.9)
+	panel.add_theme_stylebox_override("panel", style)
+	
+	var vbox = VBoxContainer.new()
+	vbox.add_theme_constant_override("separation", 10)
+	panel.add_child(vbox)
+	
+	var label = Label.new()
+	label.text = "💀 ELIMINATED!"
+	label.add_theme_font_size_override("font_size", 42)
+	label.add_theme_color_override("font_color", Color(1, 0.3, 0.3))
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	vbox.add_child(label)
+	
+	var sub = Label.new()
+	sub.text = "No lives left — spectating remaining players..."
+	sub.add_theme_font_size_override("font_size", 20)
+	sub.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	vbox.add_child(sub)
+	
+	panel.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
+	add_child(panel)
+	# Auto-hide after 4 seconds so the spectator view is clear
+	await get_tree().create_timer(4.0).timeout
+	if is_instance_valid(panel):
+		panel.queue_free()
+
 func show_victory_message(xp_earned: int) -> void:
 	if has_node("VictoryPanel"):
 		return

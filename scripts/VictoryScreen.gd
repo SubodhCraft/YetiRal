@@ -59,19 +59,112 @@ func _setup_multiplayer() -> void:
 	
 	if VFXManager:
 		VFXManager.play_victory_fireworks()
+	
+	var leaderboard: Array = GameManager.mp_leaderboard
+	var my_id = multiplayer.get_unique_id() if multiplayer.has_multiplayer_peer() else -1
+	
+	# Determine local player's position
+	var my_pos = -1
+	for i in leaderboard.size():
+		if leaderboard[i]["id"] == my_id:
+			my_pos = i
+			break
+	
+	# Win / Lose headline
+	if win_label:
+		if my_pos == 0:
+			win_label.text = "🏆 VICTORY!\nYou're the Champion!"
+			win_label.modulate = Color(1.0, 0.84, 0.0)
+		elif my_pos == 1:
+			win_label.text = "🥈 2nd Place!\nGreat Race!"
+			win_label.modulate = Color(0.85, 0.85, 0.85)
+		elif my_pos == 2:
+			win_label.text = "🥉 3rd Place!\nWell Played!"
+			win_label.modulate = Color(0.80, 0.50, 0.20)
+		else:
+			win_label.text = "You Finished!\nBetter Luck Next Time!"
+			win_label.modulate = Color(1, 1, 1)
+		win_label.pivot_offset = win_label.size / 2.0
+		var tw = create_tween().set_loops().set_trans(Tween.TRANS_SINE)
+		tw.tween_property(win_label, "scale", Vector2(1.08, 1.08), 0.6)
+		tw.tween_property(win_label, "scale", Vector2(1.0, 1.0), 0.6)
+	
+	# Reward shown
+	var xp_rewards = [200, 100, 50, 20]
+	var momo_rewards = [30, 15, 5, 2]
+	var reward_pos = min(my_pos if my_pos >= 0 else xp_rewards.size() - 1, xp_rewards.size() - 1)
+	if momos_label:
+		momos_label.text = "🎁 Rewards: +%d XP  +%d Momos" % [xp_rewards[reward_pos], momo_rewards[reward_pos]]
+	
+	# Build ranked list inside mp_container (clear first)
+	for c in mp_container.get_children():
+		if c.name != "Title" and c.name != "WinLabel" and c.name != "MomosCollectedLabel":
+			c.queue_free()
+	
+	var medals = ["🥇", "🥈", "🥉", "4️⃣", "5️⃣", "6️⃣"]
+	var rank_colors = [Color(1.0, 0.84, 0.0), Color(0.85, 0.85, 0.85), Color(0.80, 0.50, 0.20)]
+	
+	var vbox = VBoxContainer.new()
+	vbox.add_theme_constant_override("separation", 10)
+	mp_container.add_child(vbox)
+	
+	var header = Label.new()
+	header.text = "── FINAL STANDINGS ──"
+	header.add_theme_font_size_override("font_size", 22)
+	header.add_theme_color_override("font_color", Color(1.0, 0.84, 0.0))
+	header.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	vbox.add_child(header)
+	
+	for i in leaderboard.size():
+		var entry = leaderboard[i]
+		var row_panel = PanelContainer.new()
+		var row_style = StyleBoxFlat.new()
+		var is_me = entry["id"] == my_id
+		row_style.bg_color = Color(0.1, 0.1, 0.15, 0.85) if not is_me else Color(0.1, 0.3, 0.15, 0.9)
+		row_style.corner_radius_top_left = 10
+		row_style.corner_radius_top_right = 10
+		row_style.corner_radius_bottom_right = 10
+		row_style.corner_radius_bottom_left = 10
+		row_style.content_margin_left = 16
+		row_style.content_margin_right = 16
+		row_style.content_margin_top = 10
+		row_style.content_margin_bottom = 10
+		if i < rank_colors.size():
+			row_style.border_width_left = 3
+			row_style.border_color = rank_colors[i]
+		row_panel.add_theme_stylebox_override("panel", row_style)
 		
-	# Assume mp_container has 3 ColorRects/Panels for podium
-	var p1 = mp_container.get_node_or_null("Podium1")
-	var p2 = mp_container.get_node_or_null("Podium2")
-	var p3 = mp_container.get_node_or_null("Podium3")
+		var hbox = HBoxContainer.new()
+		hbox.add_theme_constant_override("separation", 12)
+		row_panel.add_child(hbox)
+		
+		var medal_lbl = Label.new()
+		medal_lbl.text = medals[min(i, medals.size() - 1)]
+		medal_lbl.add_theme_font_size_override("font_size", 28)
+		hbox.add_child(medal_lbl)
+		
+		var name_lbl = Label.new()
+		name_lbl.text = entry["username"] + (" (You)" if is_me else "")
+		name_lbl.add_theme_font_size_override("font_size", 22)
+		name_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		if is_me:
+			name_lbl.add_theme_color_override("font_color", Color(0.4, 1.0, 0.6))
+		hbox.add_child(name_lbl)
+		
+		var score_lbl = Label.new()
+		score_lbl.text = "%d pts" % entry["score"]
+		score_lbl.add_theme_font_size_override("font_size", 22)
+		score_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+		hbox.add_child(score_lbl)
+		
+		vbox.add_child(row_panel)
 	
-	var tw = create_tween().set_parallel(true).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
-	if p1: tw.tween_property(p1, "custom_minimum_size:y", 220, 1.5)
-	if p2: tw.tween_property(p2, "custom_minimum_size:y", 160, 1.5)
-	if p3: tw.tween_property(p3, "custom_minimum_size:y", 100, 1.5)
-	
+	# Only log match result once (host decides)
 	if SessionManager and SessionManager.get_current_user() != "":
-		SessionManager.log_match_result("MP", rounds_cleared, 1, momos_collected)
+		var my_rounds = GameManager.current_round_index
+		var my_momos_mp = GameManager.player_momos.get(my_id, 0)
+		SessionManager.log_match_result("MP", my_rounds, my_pos + 1, my_momos_mp)
+
 
 func _on_play_again() -> void:
 	if GameManager:
