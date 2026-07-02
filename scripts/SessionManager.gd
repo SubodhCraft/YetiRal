@@ -344,6 +344,13 @@ func _update_login_streak(username: String) -> void:
 	var current_day = int(current_time / 86400)
 	
 	var last_time = s.get("last_login_time", 0.0)
+	var last_claim_day = s.get("last_daily_claim_day", 0)
+	
+	if current_day > last_claim_day:
+		s["daily_momos"] = 0
+		s["daily_rounds"] = 0
+		s["last_daily_claim_day"] = current_day
+		
 	if last_time == 0.0:
 		s["active_days_streak"] = 1
 	else:
@@ -371,7 +378,10 @@ func _update_login_streak(username: String) -> void:
 		"username": lower_name,
 		"last_login_time": current_time,
 		"active_days_streak": s["active_days_streak"],
-		"badges": badges
+		"badges": badges,
+		"last_daily_claim_day": s.get("last_daily_claim_day", 0),
+		"daily_momos": s.get("daily_momos", 0),
+		"daily_rounds": s.get("daily_rounds", 0)
 	})
 
 
@@ -379,8 +389,13 @@ func increment_matches_played(username: String) -> void:
 	var lower_name = username.to_lower()
 	var s = get_user_stats(username)
 	s["matches_played"] += 1
+	s["daily_rounds"] = s.get("daily_rounds", 0) + 1
 	_stats[lower_name] = s
-	_make_api_call("/stats/update", HTTPClient.METHOD_POST, {"username": lower_name, "matches_played_delta": 1})
+	_make_api_call("/stats/update", HTTPClient.METHOD_POST, {
+		"username": lower_name, 
+		"matches_played_delta": 1,
+		"daily_rounds": s["daily_rounds"]
+	})
 
 func increment_wins(username: String) -> void:
 	var lower_name = username.to_lower()
@@ -393,8 +408,14 @@ func add_user_momos(username: String, amount: int) -> void:
 	var lower_name = username.to_lower()
 	var s = get_user_stats(username)
 	s["momos"] += amount
+	if amount > 0:
+		s["daily_momos"] = s.get("daily_momos", 0) + amount
 	_stats[lower_name] = s
-	_make_api_call("/stats/update", HTTPClient.METHOD_POST, {"username": lower_name, "momos_delta": amount})
+	_make_api_call("/stats/update", HTTPClient.METHOD_POST, {
+		"username": lower_name, 
+		"momos_delta": amount,
+		"daily_momos": s.get("daily_momos", 0)
+	})
 
 func spend_momos(amount: int) -> bool:
 	if not _is_logged_in:

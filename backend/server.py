@@ -76,7 +76,8 @@ def get_stats(username):
     if lower not in stats:
         stats[lower] = {
             "matches_played": 0, "wins": 0, "momos": 0, "xp": 0, "level": 1,
-            "last_login_time": 0.0, "active_days_streak": 0, "badges": [], "match_history": []
+            "last_login_time": 0.0, "active_days_streak": 0, "badges": [], "match_history": [],
+            "last_daily_claim_day": 0, "daily_momos": 0, "daily_rounds": 0
         }
         save_json(STATS_PATH, stats)
     return jsonify(stats[lower])
@@ -89,7 +90,8 @@ def update_stats():
     if username not in stats:
         stats[username] = {
             "matches_played": 0, "wins": 0, "momos": 0, "xp": 0, "level": 1,
-            "last_login_time": 0.0, "active_days_streak": 0, "badges": [], "match_history": []
+            "last_login_time": 0.0, "active_days_streak": 0, "badges": [], "match_history": [],
+            "last_daily_claim_day": 0, "daily_momos": 0, "daily_rounds": 0
         }
     if 'xp' in data: stats[username]['xp'] += data['xp']
     if 'momos_delta' in data: stats[username]['momos'] += data['momos_delta']
@@ -98,6 +100,9 @@ def update_stats():
     if 'wins_delta' in data: stats[username]['wins'] += data['wins_delta']
     if 'last_login_time' in data: stats[username]['last_login_time'] = data['last_login_time']
     if 'active_days_streak' in data: stats[username]['active_days_streak'] = data['active_days_streak']
+    if 'last_daily_claim_day' in data: stats[username]['last_daily_claim_day'] = data['last_daily_claim_day']
+    if 'daily_momos' in data: stats[username]['daily_momos'] = data['daily_momos']
+    if 'daily_rounds' in data: stats[username]['daily_rounds'] = data['daily_rounds']
     if 'badges' in data: stats[username]['badges'] = data['badges']
     if 'match_history_entry' in data:
         history = stats[username].get('match_history', [])
@@ -117,7 +122,8 @@ def sync_stats():
     if username not in stats:
         stats[username] = {}
     for key in ['momos', 'xp', 'level', 'matches_played', 'wins',
-                 'last_login_time', 'active_days_streak', 'badges', 'match_history']:
+                 'last_login_time', 'active_days_streak', 'badges', 'match_history',
+                 'last_daily_claim_day', 'daily_momos', 'daily_rounds']:
         if key in data:
             stats[username][key] = data[key]
     save_json(STATS_PATH, stats)

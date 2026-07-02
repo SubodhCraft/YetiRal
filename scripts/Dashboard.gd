@@ -1101,9 +1101,13 @@ func _setup_daily_challenges() -> void:
 	title.add_theme_font_size_override("font_size", 18)
 	vbox.add_child(title)
 	
+	var s = SessionManager.get_user_stats(SessionManager.get_current_user())
+	var momos_earned = s.get("daily_momos", 0)
+	var rounds_played = s.get("daily_rounds", 0)
+	
 	var challenges = [
-		{"name": "Collect 50 Momos", "current": 25, "max": 50},
-		{"name": "Play 5 Rounds", "current": 2, "max": 5},
+		{"name": "Collect 50 Momos", "current": min(momos_earned, 50), "max": 50},
+		{"name": "Play 5 Rounds", "current": min(rounds_played, 5), "max": 5},
 		{"name": "Login Today", "current": 1, "max": 1}
 	]
 	
@@ -1155,7 +1159,8 @@ func _setup_streak_rewards() -> void:
 	title.add_theme_font_size_override("font_size", 18)
 	vbox.add_child(title)
 	
-	var streak = 3 # Simulated streak
+	var s = SessionManager.get_user_stats(SessionManager.get_current_user())
+	var streak = s.get("active_days_streak", 0)
 	
 	var l = Label.new()
 	l.text = "Current Streak: %d Days" % streak
