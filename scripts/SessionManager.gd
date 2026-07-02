@@ -139,6 +139,8 @@ func login_user(username: String, password: String) -> Dictionary:
 				_users[lower_key]["equipped_hat"] = profile_res.get("equipped_hat", "none")
 			if profile_res.has("equipped_color"):
 				_users[lower_key]["equipped_color"] = profile_res.get("equipped_color", "#FFFFFF")
+			if profile_res.has("owned_hats"):
+				_users[lower_key]["owned_hats"] = profile_res.get("owned_hats", [])
 			_save_database()
 		
 		await fetch_friends_async()
