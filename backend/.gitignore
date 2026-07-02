@@ -1,0 +1,4 @@
+database.json
+stats.json
+__pycache__/
+*.pyc

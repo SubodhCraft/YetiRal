@@ -10,6 +10,7 @@ extends Control
 
 # ── Login form ──
 @onready var login_form:       VBoxContainer = %LoginForm
+@onready var login_ip:         LineEdit      = %LoginIPField
 @onready var login_username:   LineEdit      = %LoginUsernameField
 @onready var login_password:   LineEdit      = %LoginPasswordField
 @onready var login_btn:        Button        = %LoginButton
@@ -18,6 +19,7 @@ extends Control
 
 # ── Signup form ──
 @onready var signup_form:      VBoxContainer = %SignupForm
+@onready var signup_ip:        LineEdit      = %SignupIPField
 @onready var signup_username:  LineEdit      = %SignupUsernameField
 @onready var signup_email:     LineEdit      = %SignupEmailField
 @onready var signup_password:  LineEdit      = %SignupPasswordField
@@ -156,8 +158,12 @@ func _cross_fade(from_form: VBoxContainer, to_form: VBoxContainer) -> void:
 # LOGIC
 # ─────────────────────────────────────────────────────────────────────────────
 func _on_login_pressed() -> void:
+	var ip_val:   String = login_ip.text.strip_edges()
 	var username: String = login_username.text.strip_edges()
 	var password: String = login_password.text.strip_edges()
+
+	if not ip_val.is_empty():
+		SessionManager.backend_ip = ip_val
 
 	if username.is_empty() or password.is_empty():
 		_set_msg(login_msg, "⚠ Please fill out all fields.", MSG_COLOR_ERROR)
@@ -196,10 +202,14 @@ func _on_login_pressed() -> void:
 
 
 func _on_signup_pressed() -> void:
+	var ip_val:   String = signup_ip.text.strip_edges()
 	var username: String = signup_username.text.strip_edges()
 	var email:    String = signup_email.text.strip_edges()
 	var password: String = signup_password.text.strip_edges()
 	var confirm:  String = signup_confirm.text.strip_edges()
+
+	if not ip_val.is_empty():
+		SessionManager.backend_ip = ip_val
 
 	if username.length() < 4:
 		_set_msg(signup_msg, "⚠ Username must be at least 4 characters.", MSG_COLOR_ERROR)

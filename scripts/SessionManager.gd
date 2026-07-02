@@ -36,6 +36,8 @@ var _session_token: String = ""
 ## In-memory user store: { "username": "hashed_password_hex" }
 var _users: Dictionary = {}
 
+var backend_ip: String = "127.0.0.1"
+
 # ─────────────────────────────────────────────────────────────────────────────
 # LIFECYCLE
 # ─────────────────────────────────────────────────────────────────────────────
@@ -152,7 +154,7 @@ func login_user(username: String, password: String) -> Dictionary:
 func _make_api_call(endpoint: String, method: int, payload: Dictionary = {}) -> Dictionary:
 	var req = HTTPRequest.new()
 	add_child(req)
-	var url = "http://127.0.0.1:5000" + endpoint
+	var url = "http://" + backend_ip + ":5000" + endpoint
 	var headers = ["Content-Type: application/json"]
 	
 	var err
@@ -172,13 +174,13 @@ func _make_api_call(endpoint: String, method: int, payload: Dictionary = {}) -> 
 	var res_code = response[1]
 	var body = response[3]
 	
-	if res_result == HTTPRequest.RESULT_SUCCESS and res_code == 200:
+	if res_result == HTTPRequest.RESULT_SUCCESS:
 		var json = JSON.new()
 		if json.parse(body.get_string_from_utf8()) == OK:
 			var data = json.get_data()
 			if typeof(data) == TYPE_DICTIONARY:
 				return data
-	return {"success": false, "message": "Server error."}
+	return {"success": false, "message": "Server error (Code %d)." % res_code}
 
 
 ## Logs out the current user and clears all session data.

@@ -194,6 +194,25 @@ autowrap_mode = 3
 custom_minimum_size = Vector2(0, 8)
 layout_mode = 2
 
+[node name="IPLabel" type="Label" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/LoginForm" unique_id=1020304050]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.85, 0.9, 1)
+theme_override_font_sizes/font_size = 11
+text = "API Server IP"
+
+[node name="LoginIPField" type="LineEdit" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/LoginForm" unique_id=1020304051]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.1, 0.1, 0.1, 1)
+theme_override_colors/font_placeholder_color = Color(0.8, 0.8, 0.8, 1)
+theme_override_colors/caret_color = Color(0.2, 0.2, 0.2, 1)
+theme_override_colors/selection_color = Color(0.8, 0.9, 1, 1)
+theme_override_styles/normal = SubResource("SB_field_n")
+theme_override_styles/focus = SubResource("SB_field_f")
+placeholder_text = "127.0.0.1"
+text = "127.0.0.1"
+
 [node name="UserLabel" type="Label" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/LoginForm" unique_id=1878044091]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.8, 0.85, 0.9, 1)
@@ -357,6 +376,25 @@ autowrap_mode = 3
 [node name="Spacer1" type="Control" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/SignupForm" unique_id=752234054]
 custom_minimum_size = Vector2(0, 4)
 layout_mode = 2
+
+[node name="IPLabel" type="Label" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/SignupForm" unique_id=2030405060]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.85, 0.9, 1)
+theme_override_font_sizes/font_size = 11
+text = "API Server IP"
+
+[node name="SignupIPField" type="LineEdit" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/SignupForm" unique_id=2030405061]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.1, 0.1, 0.1, 1)
+theme_override_colors/font_placeholder_color = Color(0.8, 0.8, 0.8, 1)
+theme_override_colors/caret_color = Color(0.2, 0.2, 0.2, 1)
+theme_override_colors/selection_color = Color(0.8, 0.9, 1, 1)
+theme_override_styles/normal = SubResource("SB_field_n")
+theme_override_styles/focus = SubResource("SB_field_f")
+placeholder_text = "127.0.0.1"
+text = "127.0.0.1"
 
 [node name="EmailLabel" type="Label" parent="CenterContainer/MainVBox/GlassPanel/PanelMargin/FormsBox/SignupForm" unique_id=992959369]
 layout_mode = 2
