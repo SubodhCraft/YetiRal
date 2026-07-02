@@ -14,8 +14,14 @@ var momos_collected: int = 0
 
 func _ready() -> void:
 	if GameManager:
-		rounds_cleared  = GameManager.current_round_index
-		momos_collected = GameManager.momos
+		rounds_cleared = GameManager.current_round_index
+		# In singleplayer, momos is a simple int on GameManager.
+		# In multiplayer, use player_momos dict keyed by peer_id.
+		if GameManager.is_multiplayer and multiplayer.has_multiplayer_peer():
+			var my_id = multiplayer.get_unique_id()
+			momos_collected = GameManager.player_momos.get(my_id, 0)
+		else:
+			momos_collected = GameManager.momos
 
 	if AudioManager:
 		AudioManager.play_track(AudioManager.MusicTrack.VICTORY)

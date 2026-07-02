@@ -90,6 +90,15 @@ const FALL_VELOCITY_THRESHOLD: float = -20.0
 ## Seconds of continuous fast-fall before player_fell is emitted.
 const FALL_EMIT_DELAY: float = 0.3
 
+## ─── NETWORK SYNC STATE (MP only) ───────────────────────────────────────────
+## Received from authority peer via RPC; applied smoothly in _process().
+var _net_target_position: Vector3 = Vector3.ZERO
+var _net_velocity: Vector3 = Vector3.ZERO
+var _net_visuals_rot_y: float = 0.0
+## Throttle: broadcast every N physics frames (~30 Hz at 60 fps)
+const NET_SEND_INTERVAL: int = 2
+var _net_send_counter: int = 0
+
 ## ─── SIGNALS ─────────────────────────────────────────────────────────────────
 ## Emitted once when the player has been falling faster than FALL_VELOCITY_THRESHOLD
 ## for longer than FALL_EMIT_DELAY seconds.  Resets after the player lands.
@@ -104,29 +113,15 @@ func _ready() -> void:
 		if peer_id > 0:
 			set_multiplayer_authority(peer_id)
 		
-		# Set up dynamic MultiplayerSynchronizer on ALL peers so they can receive updates
-		var sync = MultiplayerSynchronizer.new()
-		sync.name = "MultiplayerSynchronizer"
-		var config = SceneReplicationConfig.new()
-		config.add_property(^".:global_position")
-		config.add_property(^".:velocity")
-		config.add_property(^"Visuals:rotation")
-		sync.replication_config = config
-		add_child(sync)
-		sync.set_multiplayer_authority(peer_id)
-		
 		if not is_multiplayer_authority():
 			if has_node("SpringArm3D"):
 				$SpringArm3D.queue_free()
-			# Disable physics and input for remote players, but keep process()
-			# enabled so the MultiplayerSynchronizer can apply position updates
-			# every frame — without this the character appears frozen in spectator.
+			# Keep set_process(true) — _process() applies incoming RPC positions.
 			set_physics_process(false)
 			set_process_unhandled_input(false)
 			set_process_input(false)
-			# set_process(false) intentionally omitted — needed for network sync
 			return
-			
+		
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 
 func setup_username_label(username: String) -> void:
@@ -169,7 +164,17 @@ func _toggle_mouse_lock() -> void:
 ## ─── PROCESS (non-physics per-frame logic) ───────────────────────────────────
 func _process(delta: float) -> void:
 	if multiplayer.has_multiplayer_peer() and not is_multiplayer_authority():
+		# Apply RPC-received position/rotation smoothly via lerp.
+		if _net_target_position != Vector3.ZERO:
+			global_position = global_position.lerp(_net_target_position, 18.0 * delta)
+		if visuals:
+			visuals.rotation.y = lerp_angle(visuals.rotation.y, _net_visuals_rot_y, 18.0 * delta)
+			var xz = Vector2(_net_velocity.x, _net_velocity.z).length()
+			var anim_state = "run" if xz > 1.0 else "idle"
+			if visuals.has_method("update_animation"):
+				visuals.update_animation(anim_state)
 		return
+
 
 	# ── Emote cooldown tick ───────────────────────────────────────────────────
 	if _emote_cooldown_timer > 0.0:
@@ -322,6 +327,23 @@ func _physics_process(delta: float) -> void:
 	external_velocity = Vector3.ZERO
 	_in_wind_tunnel = false  # WindTunnel must call enter_wind_tunnel() every tick
 	_wind_push = Vector3.ZERO
+
+	# ── Broadcast position to all remote peers (throttled) ───────────────────────
+	if GameManager.is_multiplayer and multiplayer.has_multiplayer_peer():
+		_net_send_counter += 1
+		if _net_send_counter >= NET_SEND_INTERVAL:
+			_net_send_counter = 0
+			var vis_rot_y = visuals.rotation.y if visuals else 0.0
+			rpc("_recv_state_rpc", global_position, velocity, vis_rot_y)
+
+## ─── NETWORK POSITION RPC ───────────────────────────────────────────────────
+## Sent by the authority player every NET_SEND_INTERVAL physics frames to all peers.
+## Remote copies store the values; _process() lerps towards them every frame.
+@rpc("any_peer", "call_remote", "unreliable_ordered")
+func _recv_state_rpc(pos: Vector3, vel: Vector3, vis_rot_y: float) -> void:
+	_net_target_position = pos
+	_net_velocity        = vel
+	_net_visuals_rot_y   = vis_rot_y
 
 ## ─── SLIPPERY ZONE API ───────────────────────────────────────────────────────
 ## Called by SlipperyZone.gd when the player enters a wet/muddy hazard zone.
