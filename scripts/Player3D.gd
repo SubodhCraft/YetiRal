@@ -113,6 +113,7 @@ func _ready() -> void:
 		config.add_property(^"Visuals:rotation")
 		sync.replication_config = config
 		add_child(sync)
+		sync.set_multiplayer_authority(peer_id)
 		
 		if not is_multiplayer_authority():
 			if has_node("SpringArm3D"):

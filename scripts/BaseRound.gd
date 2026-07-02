@@ -27,6 +27,7 @@ enum RoundType { RACE, SURVIVAL, MEMORY, FINAL }
 var time_remaining: float
 var hud: Control
 var round_ended: bool = false
+var local_player_finished: bool = false
 var round_started: bool = false
 
 ## ─── FEATURE 1: checkpoint tracking ─────────────────────────────────────────
@@ -273,7 +274,8 @@ func _on_finish_zone_body_entered(body: Node3D) -> void:
 	if body is CharacterBody3D:
 		if GameManager.is_multiplayer and multiplayer.has_multiplayer_peer():
 			if body.is_multiplayer_authority():
-				round_ended = true
+				if local_player_finished: return
+				local_player_finished = true
 				body.set_physics_process(false)
 				body.set_process_unhandled_input(false)
 				body.set_process_input(false)
