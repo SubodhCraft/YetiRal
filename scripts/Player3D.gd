@@ -104,6 +104,16 @@ func _ready() -> void:
 		if peer_id > 0:
 			set_multiplayer_authority(peer_id)
 		
+		# Set up dynamic MultiplayerSynchronizer on ALL peers so they can receive updates
+		var sync = MultiplayerSynchronizer.new()
+		sync.name = "MultiplayerSynchronizer"
+		var config = SceneReplicationConfig.new()
+		config.add_property(^".:global_position")
+		config.add_property(^".:velocity")
+		config.add_property(^"Visuals:rotation")
+		sync.replication_config = config
+		add_child(sync)
+		
 		if not is_multiplayer_authority():
 			if has_node("SpringArm3D"):
 				$SpringArm3D.queue_free()
@@ -113,16 +123,7 @@ func _ready() -> void:
 			set_process_unhandled_input(false)
 			set_process_input(false)
 			return
-		
-		# Set up dynamic MultiplayerSynchronizer
-		var sync = MultiplayerSynchronizer.new()
-		sync.name = "MultiplayerSynchronizer"
-		var config = SceneReplicationConfig.new()
-		config.add_property(^".:global_position")
-		config.add_property(^"Visuals:rotation")
-		sync.replication_config = config
-		add_child(sync)
-		
+			
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 
 func setup_username_label(username: String) -> void:

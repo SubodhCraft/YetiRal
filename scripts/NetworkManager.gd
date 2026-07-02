@@ -4,8 +4,8 @@ const DEFAULT_PORT: int = 8910
 const MAX_CLIENTS: int = 4 # Host + 4 clients = 5 players max
 const UDP_BROADCAST_PORT: int = 8911
 
-@export var heartbeat_interval: float = 5.0
-@export var heartbeat_timeout: float = 10.0
+@export var heartbeat_interval: float = 8.0
+@export var heartbeat_timeout: float = 30.0
 @export var search_timeout: float = 10.0
 @export var udp_broadcast_interval: float = 2.0
 

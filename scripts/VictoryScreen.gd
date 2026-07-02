@@ -96,10 +96,18 @@ func _setup_multiplayer() -> void:
 	if momos_label:
 		momos_label.text = "🎁 Rewards: +%d XP  +%d Momos" % [xp_rewards[reward_pos], momo_rewards[reward_pos]]
 	
-	# Build ranked list inside mp_container (clear first)
-	for c in mp_container.get_children():
-		if c.name != "Title" and c.name != "WinLabel" and c.name != "MomosCollectedLabel":
-			c.queue_free()
+	# Build ranked list inside a container (create if missing)
+	if not mp_container:
+		mp_container = VBoxContainer.new()
+		mp_container.name = "DynamicMPContainer"
+		mp_container.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
+		# Move it down a bit to not overlap title
+		mp_container.position.y += 100
+		add_child(mp_container)
+	else:
+		for c in mp_container.get_children():
+			if c.name != "Title" and c.name != "WinLabel" and c.name != "MomosCollectedLabel":
+				c.queue_free()
 	
 	var medals = ["🥇", "🥈", "🥉", "4️⃣", "5️⃣", "6️⃣"]
 	var rank_colors = [Color(1.0, 0.84, 0.0), Color(0.85, 0.85, 0.85), Color(0.80, 0.50, 0.20)]
@@ -158,6 +166,14 @@ func _setup_multiplayer() -> void:
 		hbox.add_child(score_lbl)
 		
 		vbox.add_child(row_panel)
+		
+		# Animate the row sliding in
+		row_panel.modulate.a = 0.0
+		row_panel.position.x = 200
+		var row_tw = create_tween().set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+		row_tw.tween_interval(0.15 * i)
+		row_tw.tween_property(row_panel, "modulate:a", 1.0, 0.4)
+		row_tw.parallel().tween_property(row_panel, "position:x", 0.0, 0.4)
 	
 	# Only log match result once (host decides)
 	if SessionManager and SessionManager.get_current_user() != "":

@@ -30,9 +30,8 @@ var is_multiplayer: bool = false
 var multiplayer_rounds: Array = []        # Shuffled for MP (synced from host)
 var player_scores: Dictionary = {}        # peer_id -> score
 var player_momos: Dictionary = {}         # peer_id -> momos count
-var player_lives: Dictionary = {}         # peer_id -> remaining lives (MP)
 var round_finishes: Array = []            # peer_ids in finish order this round
-var player_finished_status: Dictionary = {} # peer_id -> bool (finished or eliminated)
+var player_finished_status: Dictionary = {} # peer_id -> bool (finished)
 var mp_leaderboard: Array = []            # sorted [{"id": pid, "score": n, "username": s}]
 
 # ─── FACT TRACKING ────────────────────────────────────────────────────────────
@@ -156,13 +155,11 @@ func start_multiplayer_game() -> void:
 	shown_facts.clear()
 	player_scores.clear()
 	player_momos.clear()
-	player_lives.clear()
 	mp_leaderboard.clear()
 
 	for pid in NetworkManager.players:
 		player_scores[pid] = 0
 		player_momos[pid] = 0
-		player_lives[pid] = 3  # Every player starts with 3 lives
 
 	# Only the HOST generates and distributes the map order
 	if multiplayer.is_server():
@@ -213,30 +210,6 @@ func submit_finish(peer_id: int) -> void:
 			get_tree().create_timer(3.0).timeout.connect(func():
 				host_advance_round()
 			)
-# Called by the server-side submit_finish RPC when someone is eliminated too.
-@rpc("authority", "call_local", "reliable")
-func deduct_mp_life(peer_id: int) -> void:
-	if not player_lives.has(peer_id):
-		player_lives[peer_id] = 3
-	player_lives[peer_id] -= 1
-	stats_changed.emit()
-
-	# If the server finds this player eliminated, mark them as finished so the
-	# round can progress without waiting for them forever.
-	if multiplayer.is_server() and player_lives[peer_id] <= 0:
-		if not player_finished_status.get(peer_id, false):
-			player_finished_status[peer_id] = true
-			if peer_id not in round_finishes:
-				round_finishes.append(peer_id)
-			rpc("sync_round_finishes", round_finishes)
-			# Check if all players are now accounted for
-			var all_done = true
-			for pid in NetworkManager.players:
-				if not player_finished_status.get(pid, false):
-					all_done = false
-					break
-			if all_done:
-				get_tree().create_timer(3.0).timeout.connect(func(): host_advance_round())
 
 @rpc("authority", "call_local", "reliable")
 func sync_round_finishes(updated_finishes: Array) -> void:
@@ -246,19 +219,18 @@ func sync_round_finishes(updated_finishes: Array) -> void:
 func host_advance_round() -> void:
 	if not multiplayer.is_server():
 		return
-	# Award placement points: 1st=10, 2nd=8, 3rd=6, 4th=4, 5th=2
-	var placement_points = [10, 8, 6, 4, 2]
+	# Award placement points for finishers only: 1st=10, 2nd=7, 3rd=5, 4th=3, 5th=1
+	var placement_points = [10, 7, 5, 3, 1]
 	for i in range(round_finishes.size()):
 		var pid = round_finishes[i]
 		var pts = placement_points[min(i, placement_points.size() - 1)]
 		player_scores[pid] = player_scores.get(pid, 0) + pts
 	var next_idx = current_round_index + 1
-	rpc("goto_multiplayer_round", next_idx, player_scores, player_lives)
+	rpc("goto_multiplayer_round", next_idx, player_scores)
 
 @rpc("authority", "call_local", "reliable")
-func goto_multiplayer_round(next_index: int, synced_scores: Dictionary, synced_lives: Dictionary) -> void:
+func goto_multiplayer_round(next_index: int, synced_scores: Dictionary) -> void:
 	player_scores = synced_scores
-	player_lives = synced_lives  # Keep lives in sync across all peers
 	if multiplayer.get_unique_id() in round_finishes:
 		if SessionManager.is_logged_in():
 			SessionManager.add_xp(SessionManager.get_current_user(), 50)

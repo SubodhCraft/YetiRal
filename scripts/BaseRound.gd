@@ -202,8 +202,8 @@ func _update_hud_stats() -> void:
 		if GameManager.is_multiplayer and multiplayer.has_multiplayer_peer():
 			var my_id = multiplayer.get_unique_id()
 			var my_momos = GameManager.player_momos.get(my_id, 0)
-			var my_lives = GameManager.player_lives.get(my_id, 3)
-			hud.update_stats(my_lives, my_momos)
+			# Pass -1 to indicate infinity lives
+			hud.update_stats(-1, my_momos)
 		else:
 			hud.update_stats(GameManager.lives, GameManager.momos)
 
@@ -215,18 +215,7 @@ func _on_kill_zone_body_entered(body: Node3D) -> void:
 			if body.is_multiplayer_authority():
 				var pid: int = body.get_multiplayer_authority()
 				
-				# Tell the server to deduct a life — it will broadcast back to everyone
-				GameManager.rpc_id(1, "deduct_mp_life", pid)
-				
-				var current_lives = GameManager.player_lives.get(pid, 3) - 1
-				if current_lives <= 0:
-					# No lives left — become a spectator immediately
-					_make_spectator(body as CharacterBody3D, pid)
-					if hud and hud.has_method("show_eliminated_message"):
-						hud.show_eliminated_message()
-					return
-				
-				# Still has lives — respawn at last checkpoint or spawn point
+				# Infinity lives — respawn at last checkpoint or spawn point
 				var target: Marker3D = _player_checkpoints.get(body, spawn_point) as Marker3D
 				if not target:
 					target = spawn_point
@@ -502,29 +491,47 @@ func _find_player_by_peer_id(peer_id: int) -> Node:
 func _activate_finish_spectator_camera(body: CharacterBody3D) -> void:
 	var spec_cam := Camera3D.new()
 	spec_cam.name = "FinishSpectatorCamera"
-	# Position high above the finish area looking down
-	spec_cam.global_position = body.global_position + Vector3(0.0, 14.0, 10.0)
-	spec_cam.rotation_degrees = Vector3(-35.0, 180.0, 0.0)
 	get_tree().current_scene.add_child(spec_cam)
 	spec_cam.make_current()
 
-	# Gentle slow pan so the spectating player sees the whole level
 	var cam_ref: Camera3D = spec_cam
-	var move_speed: float = 5.0
+	var state = {"idx": 0, "tab_pressed_last": false}
+	
 	get_tree().process_frame.connect(
 		func() -> void:
 			if not is_instance_valid(cam_ref) or not cam_ref.is_current():
 				return
-			var d: float = get_process_delta_time()
-			var move: Vector3 = Vector3.ZERO
-			if Input.is_key_pressed(KEY_W): move -= cam_ref.global_transform.basis.z
-			if Input.is_key_pressed(KEY_S): move += cam_ref.global_transform.basis.z
-			if Input.is_key_pressed(KEY_A): move -= cam_ref.global_transform.basis.x
-			if Input.is_key_pressed(KEY_D): move += cam_ref.global_transform.basis.x
-			if Input.is_key_pressed(KEY_Q): move -= Vector3.UP
-			if Input.is_key_pressed(KEY_E): move += Vector3.UP
-			if move != Vector3.ZERO:
-				cam_ref.global_position += move.normalized() * move_speed * d
+				
+			# Cycle logic using raw key check with simple debounce
+			var tab_down = Input.is_key_pressed(KEY_TAB)
+			if tab_down and not state["tab_pressed_last"]:
+				state["idx"] += 1
+			state["tab_pressed_last"] = tab_down
+			
+			# Refresh active players
+			var active_players = []
+			for child in get_children():
+				if child is CharacterBody3D and child != body:
+					var pid = child.name.to_int()
+					if not _spectators.has(pid):
+						if GameManager.is_multiplayer and not GameManager.player_finished_status.get(pid, false):
+							active_players.append(child)
+			
+			if active_players.size() == 0:
+				# Nobody left, orbit the finish line area
+				var finish_pos = body.global_position
+				if finish_zone: finish_pos = finish_zone.global_position
+				var desired = finish_pos + Vector3(0.0, 14.0, 10.0)
+				cam_ref.global_position = cam_ref.global_position.lerp(desired, 3.0 * get_process_delta_time())
+				cam_ref.look_at(finish_pos)
+				return
+				
+			state["idx"] = state["idx"] % active_players.size()
+			var target = active_players[state["idx"]]
+			
+			var desired_pos = target.global_position + Vector3(0.0, 4.0, 5.0)
+			cam_ref.global_position = cam_ref.global_position.lerp(desired_pos, 6.0 * get_process_delta_time())
+			cam_ref.look_at(target.global_position + Vector3(0, 1.5, 0))
 	)
 
 
@@ -623,7 +630,17 @@ func _show_round_info_card() -> void:
 		"7 · Lava Doors 🌋",
 		"8 · Avalanche Run 🌨",
 	]
-	var current_idx = GameManager.current_round_index if GameManager else 0
+	
+	# Determine the true index in the fixed ordered list based on the scene's file path
+	var current_idx = 0
+	if GameManager:
+		var current_path = get_tree().current_scene.scene_file_path
+		var found_idx = GameManager.ROUNDS.find(current_path)
+		if found_idx != -1:
+			current_idx = found_idx
+		else:
+			current_idx = GameManager.current_round_index
+			
 	var journey_grid = HFlowContainer.new()
 	journey_grid.add_theme_constant_override("h_separation", 16)
 	journey_grid.add_theme_constant_override("v_separation", 6)
