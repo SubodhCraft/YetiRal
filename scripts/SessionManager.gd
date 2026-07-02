@@ -388,7 +388,7 @@ func _update_login_streak(username: String) -> void:
 func increment_matches_played(username: String) -> void:
 	var lower_name = username.to_lower()
 	var s = get_user_stats(username)
-	s["matches_played"] += 1
+	s["matches_played"] = s.get("matches_played", 0) + 1
 	s["daily_rounds"] = s.get("daily_rounds", 0) + 1
 	_stats[lower_name] = s
 	_make_api_call("/stats/update", HTTPClient.METHOD_POST, {
@@ -400,14 +400,14 @@ func increment_matches_played(username: String) -> void:
 func increment_wins(username: String) -> void:
 	var lower_name = username.to_lower()
 	var s = get_user_stats(username)
-	s["wins"] += 1
+	s["wins"] = s.get("wins", 0) + 1
 	_stats[lower_name] = s
 	_make_api_call("/stats/update", HTTPClient.METHOD_POST, {"username": lower_name, "wins_delta": 1})
 
 func add_user_momos(username: String, amount: int) -> void:
 	var lower_name = username.to_lower()
 	var s = get_user_stats(username)
-	s["momos"] += amount
+	s["momos"] = s.get("momos", 0) + amount
 	if amount > 0:
 		s["daily_momos"] = s.get("daily_momos", 0) + amount
 	_stats[lower_name] = s
@@ -422,8 +422,8 @@ func spend_momos(amount: int) -> bool:
 		return false
 	var lower_name = _current_user.to_lower()
 	var s = get_user_stats(_current_user)
-	if s["momos"] >= amount:
-		s["momos"] -= amount
+	if s.get("momos", 0) >= amount:
+		s["momos"] = s.get("momos", 0) - amount
 		_stats[lower_name] = s
 		_make_api_call("/stats/update", HTTPClient.METHOD_POST, {"username": lower_name, "momos_delta": -amount})
 		return true
