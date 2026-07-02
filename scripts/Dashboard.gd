@@ -251,7 +251,7 @@ func _refresh_lobby_player_list() -> void:
 		var lbl = Label.new()
 		var ready_icon = "✅" if NetworkManager.player_ready.get(pid, false) else "⏳"
 		lbl.text = "%s %s" % [ready_icon, pdata.get("username", "Player")]
-		lbl.theme_override_font_sizes["font_size"] = 16
+		lbl.add_theme_font_size_override("font_size", 16)
 		lobby_players_list.add_child(lbl)
 	if start_match_btn:
 		start_match_btn.disabled = (count < 2) or not NetworkManager.is_host
