@@ -303,16 +303,16 @@ func get_user_stats(username: String) -> Dictionary:
 func add_xp(username: String, amount: int) -> void:
 	var lower_name = username.to_lower()
 	var s = get_user_stats(username)
-	s["xp"] += amount
+	s["xp"] = s.get("xp", 0) + amount
 
 	var leveled_up = false
-	var new_level = s["level"]
+	var new_level = s.get("level", 1)
 
 	while true:
-		var xp_needed = s["level"] * 100
-		if s["xp"] >= xp_needed:
-			s["xp"] -= xp_needed
-			s["level"] += 1
+		var xp_needed = s.get("level", 1) * 100
+		if s.get("xp", 0) >= xp_needed:
+			s["xp"] = s.get("xp", 0) - xp_needed
+			s["level"] = s.get("level", 1) + 1
 			leveled_up = true
 			new_level = s["level"]
 		else:
@@ -325,10 +325,10 @@ func add_xp(username: String, amount: int) -> void:
 
 	_stats[lower_name] = s
 	# Persist to server
-	var payload = {"username": lower_name, "xp": s["xp"], "level": s["level"], "momos_delta": 0}
+	var payload = {"username": lower_name, "xp": s.get("xp", 0), "level": s.get("level", 1), "momos_delta": 0}
 	if leveled_up: payload["momos_delta"] = 50
 	_make_api_call("/stats/sync", HTTPClient.METHOD_POST, {
-		"username": lower_name, "xp": s["xp"], "level": s["level"], "momos": s["momos"]
+		"username": lower_name, "xp": s.get("xp", 0), "level": s.get("level", 1), "momos": s.get("momos", 0)
 	})
 
 func consume_pending_level_ups() -> Array:
